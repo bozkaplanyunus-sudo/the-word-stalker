@@ -1,5 +1,5 @@
 
-export type Language = 'en' | 'fr' | 'tr';
+export type Language = 'en' | 'fr' | 'tr' | 'la';
 
 export type Category = 'Noun' | 'Verb' | 'Adjective' | 'Adverb';
 
@@ -8,14 +8,15 @@ export interface Word {
   en: string;
   fr: string;
   tr: string;
+  la: string;
   category: Category;
   rarity: number; // 1-20: level mapping
 }
 
 export interface GameState {
   score: number;
-  currentMapLevel: number; // The level currently being played
-  maxUnlockedLevel: number; // The highest level the user has reached
+  currentMapLevel: number;
+  maxUnlockedLevel: number;
   currentLanguage: Language;
   targetLanguage: Language;
   category: Category | null;
@@ -27,6 +28,6 @@ export interface GameState {
   streak: number;
   correctAnswersInLevel: number;
   totalAnswersInLevel: number;
-  seenWordIds: string[]; // Track IDs seen in the current level session
+  seenWordIds: string[];
   gameStatus: 'setup' | 'map' | 'playing' | 'level-up' | 'level-failed' | 'finished';
 }

@@ -1,556 +1,378 @@
 
-import { Word, Category, Language } from './types';
+import { Word, Category, Language, GrammarExercise, LevelInfo } from './types';
 
 export const CATEGORIES: Category[] = ['Noun', 'Verb', 'Adjective', 'Adverb'];
 
 export const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
-  { code: 'la', name: 'Latina', flag: '🏛️' }
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' }
 ];
 
 export const UI_TRANSLATIONS: Record<Language, Record<string, string>> = {
   en: {
-    welcome: "Welcome stalker!",
+    welcome: "Welcome!",
     subWelcome: "Choose your languages and start hunting.",
     sourceLabel: "My native language",
     targetLabel: "Target language",
+    modeLabel: "Game Mode",
+    vocabularyMode: "Vocabulary",
+    grammarMode: "Grammar",
     startBtn: "Start hunting 🏹",
-    statsTitle: "Stalker stats",
     level: "Level",
-    points: "Points",
     score: "Score",
     target: "Target language",
     map: "Map",
-    levelSelectTitle: "Galaxy map",
-    levelSelectSub: "Planet locked. Initiate descent?",
     analyzing: "Scanning galaxy...",
-    stalkerMode: "Advanced stalker",
-    textMode: "Text mode",
-    visualPattern: "Analyze signal",
     progress: "Progress",
     promoted: "Mission successful!",
     levelClear: "Planet clear",
     nextSector: "Next planet 🚀",
-    locked: "+10",
-    compromised: "-5",
-    training: "Training",
-    fieldWork: "Field work",
     backToSetup: "Back to languages",
-    nextLevel: "Next level",
     failed: "Mission failed",
-    failedSub: "You must get at least 40/50 to advance.",
-    retry: "Retry level 🔄"
+    failedSub: "You must get at least 8/10 to advance.",
+    retry: "Retry level 🔄",
+    backToMap: "Back to map",
+    backToHome: "Back to home",
+    startLesson: "Start Lesson",
+    lessonTitle: "Lesson Briefing",
+    orderingInstruction: "Put them in order!",
+    clear: "Clear"
   },
   tr: {
-    welcome: "Hoşgeldin takipçi!",
+    welcome: "Hoşgeldiniz",
     subWelcome: "Dillerini seç ve avlanmaya başla.",
     sourceLabel: "Ana dilim",
     targetLabel: "Hedef dil",
+    modeLabel: "Oyun Modu",
+    vocabularyMode: "Kelime",
+    grammarMode: "Gramer",
     startBtn: "Avlanmaya başla 🏹",
-    statsTitle: "Takipçi istatistikleri",
     level: "Seviye",
-    points: "Puan",
     score: "Puan",
     target: "Hedef dil",
     map: "Harita",
-    levelSelectTitle: "Galaksi haritası",
-    levelSelectSub: "Gezegen kilitlendi. İniş yapılsın mı?",
     analyzing: "Galaksi taranıyor...",
-    stalkerMode: "Gelişmiş takipçi",
-    textMode: "Metin modu",
-    visualPattern: "Sinyali analiz et",
     progress: "İlerleme",
     promoted: "İz sürme başarıyla tamamlandı",
     levelClear: "Gezegen tamamlandı",
     nextSector: "Sıradaki seviye 🚀",
-    locked: "+10",
-    compromised: "-5",
-    training: "Eğitim",
-    fieldWork: "Saha görevi",
     backToSetup: "Dillere dön",
-    nextLevel: "Sıradaki seviye",
     failed: "Görev başarısız",
-    failedSub: "İlerlemek için en az 40/50 yapmalısın.",
-    retry: "Seviyeyi tekrarla 🔄"
+    failedSub: "İlerlemek için en az 8/10 yapmalısın.",
+    retry: "Seviyeyi tekrarla 🔄",
+    backToMap: "Haritaya dön",
+    backToHome: "Anasayfaya dön",
+    startLesson: "Derse Başla",
+    lessonTitle: "Görev Bilgilendirmesi",
+    orderingInstruction: "Sıraya diz!",
+    clear: "Temizle"
   },
   fr: {
-    welcome: "Bienvenue traqueur !",
+    welcome: "Bienvenue !",
     subWelcome: "Choisissez vos langues et commencez la chasse.",
     sourceLabel: "Ma langue maternelle",
     targetLabel: "Langue cible",
+    modeLabel: "Mode de jeu",
+    vocabularyMode: "Vocabulaire",
+    grammarMode: "Grammaire",
     startBtn: "Commencer la chasse 🏹",
-    statsTitle: "Stats du traqueur",
     level: "Niveau",
-    points: "Points",
     score: "Points",
     target: "Langue cible",
     map: "Carte",
-    levelSelectTitle: "Carte galactique",
-    levelSelectSub: "Planète verrouillée. Lancer la descente ?",
     analyzing: "Analyse de la galaxie...",
-    stalkerMode: "Traqueur avancé",
-    textMode: "Mode texte",
-    visualPattern: "Analyser le signal",
     progress: "Progression",
     promoted: "Mission réussie !",
     levelClear: "Planète terminée",
     nextSector: "Planète suivante 🚀",
-    locked: "+10",
-    compromised: "-5",
-    training: "Entraînement",
-    fieldWork: "Sur le terrain",
     backToSetup: "Retour aux langues",
-    nextLevel: "Niveau suivant",
     failed: "Mission échouée",
-    failedSub: "Vous devez obtenir au moins 40/50 pour avancer.",
-    retry: "Réessayer le niveau 🔄"
-  },
-  la: {
-    welcome: "Salve indagator!",
-    subWelcome: "Linguas elige et venari incipe.",
-    sourceLabel: "Lingua patria",
-    targetLabel: "Lingua scopas",
-    startBtn: "Venari incipe 🏹",
-    statsTitle: "Statistica indagatoris",
-    level: "Gradus",
-    points: "Puncta",
-    score: "Puncta",
-    target: "Lingua scopas",
-    map: "Tabula",
-    levelSelectTitle: "Tabula galactica",
-    levelSelectSub: "Planeta clausa. Descensus inchoetur?",
-    analyzing: "Galaxia lustratur...",
-    stalkerMode: "Indagator provectus",
-    textMode: "Modus textus",
-    visualPattern: "Signum explora",
-    progress: "Progressus",
-    promoted: "Missio prospere gesta!",
-    levelClear: "Planeta perlustrata",
-    nextSector: "Proxima planeta 🚀",
-    locked: "+10",
-    compromised: "-5",
-    training: "Exercitatio",
-    fieldWork: "Labor campi",
-    backToSetup: "Ad linguas redi",
-    nextLevel: "Proximus gradus",
-    failed: "Missio irrita",
-    failedSub: "Minimum XL/L puncta ad procedendum opus est.",
-    retry: "Gradum itera 🔄"
+    failedSub: "Vous devez obtenir au moins 8/10 pour avancer.",
+    retry: "Réessayer le niveau 🔄",
+    backToMap: "Retour à la carte",
+    backToHome: "Retour à l'accueil",
+    startLesson: "Commencer la leçon",
+    lessonTitle: "Briefing de mission",
+    orderingInstruction: "Mettez en ordre !",
+    clear: "Effacer"
   }
 };
 
-const createLevel = (level: number, words: [string, string, string, string, Category][]): Word[] => {
+// Grammar Level Info
+export const LEVEL_INFO: Record<Language, Record<number, LevelInfo>> = {
+  tr: {
+    1: {
+      title: "Alfabe",
+      explanation: "Türkçe’de 29 harf bulunmaktadır. Bunlardan 8 tanesi sesli, 21 tanesi sessizdir.",
+      examples: [
+        { original: "Sesli Harfler", translated: "a, e, ı, i, o, ö, u, ü" },
+        { original: "Sessiz Harfler", translated: "b, c, ç, d, f, g, ğ, h, j, k, l, m, n, p, r, s, ş, t, v, y, z" }
+      ]
+    },
+    2: {
+      title: "Sayılar",
+      explanation: "",
+      examples: [
+        { original: "1", translated: "Bir" }, { original: "2", translated: "İki" },
+        { original: "3", translated: "Üç" }, { original: "4", translated: "Dört" },
+        { original: "5", translated: "Beş" }, { original: "6", translated: "Altı" },
+        { original: "7", translated: "Yedi" }, { original: "8", translated: "Sekiz" },
+        { original: "9", translated: "Dokuz" }, { original: "10", translated: "On" },
+        { original: "11", translated: "On Bir" }, { original: "12", translated: "On İki" },
+        { original: "13", translated: "On Üç" }, { original: "14", translated: "On Dört" },
+        { original: "15", translated: "On Beş" }, { original: "16", translated: "On Altı" },
+        { original: "17", translated: "On Yedi" }, { original: "18", translated: "On Sekiz" },
+        { original: "19", translated: "On Dokuz" }, { original: "20", translated: "Yirmi" },
+        { original: "30", translated: "Otuz" }, { original: "40", translated: "Kırk" },
+        { original: "50", translated: "Elli" }, { original: "60", translated: "Altmış" },
+        { original: "70", translated: "Yetmiş" }, { original: "80", translated: "Seksen" },
+        { original: "90", translated: "Doksan" }, { original: "100", translated: "Yüz" }
+      ]
+    }
+  },
+  en: {
+    1: {
+      title: "Alphabet",
+      explanation: "English alphabet consists of 26 letters.",
+      examples: [
+        { original: "Vowels", translated: "a, e, i, o, u" },
+        { original: "Consonants", translated: "b, c, d, f, g, ..." }
+      ]
+    },
+    2: {
+      title: "Numbers",
+      explanation: "Let's learn counting from 1 to 10.",
+      examples: [
+        { original: "1, 2, 3", translated: "One, Two, Three" }
+      ]
+    }
+  },
+  fr: {
+    1: {
+      title: "L'Alphabet",
+      explanation: "L'alphabet français comprend 26 lettres.",
+      examples: [
+        { original: "Voyelles", translated: "a, e, i, o, u, y" },
+        { original: "Consonants", translated: "b, c, d, f, g, ..." }
+      ]
+    },
+    2: {
+      title: "Les Nombres",
+      explanation: "Apprenons à compter de 1 à 10.",
+      examples: [
+        { original: "1, 2, 3", translated: "Un, Deux, Trois" }
+      ]
+    }
+  }
+};
+
+// Grammar Exercises
+export const GRAMMAR_DATABASE: GrammarExercise[] = [
+  // --- TÜRKÇE SEVİYE 1: ALFABE ---
+  {
+    id: "tr-l1-full",
+    language: "tr",
+    type: "ordering",
+    sentence: "TÜM ALFABE: Harflerin tamamını doğru sıraya diz!",
+    translations: { en: "FULL ALPHABET: Put all letters in order!", tr: "TÜM ALFABE: Tüm harfleri sıraya diz!", fr: "ALPHABET COMPLET : Mettez toutes les lettres dans l'ordre !" },
+    correctAnswer: "A,B,C,Ç,D,E,F,G,Ğ,H,I,İ,J,K,L,M,N,O,Ö,P,R,S,Ş,T,U,Ü,V,Y,Z",
+    options: ["A", "B", "C", "Ç", "D", "E", "F", "G", "Ğ", "H", "I", "İ", "J", "K", "L", "M", "N", "O", "Ö", "P", "R", "S", "Ş", "T", "U", "Ü", "V", "Y", "Z"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
+    id: "tr-l1-g1",
+    language: "tr",
+    type: "ordering",
+    sentence: "Grup 1: A'dan D'ye",
+    translations: { en: "Group 1: A to D", tr: "Grup 1: A'dan D'ye", fr: "Groupe 1 : A à D" },
+    correctAnswer: "A,B,C,Ç,D",
+    options: ["B", "Ç", "A", "D", "C"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
+    id: "tr-l1-g2",
+    language: "tr",
+    type: "ordering",
+    sentence: "Grup 2: E'den H'ye",
+    translations: { en: "Group 2: E to H", tr: "Grup 2: E'den H'ye", fr: "Groupe 2 : E à H" },
+    correctAnswer: "E,F,G,Ğ,H",
+    options: ["Ğ", "F", "H", "E", "G"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
+    id: "tr-l1-g3",
+    language: "tr",
+    type: "ordering",
+    sentence: "Grup 3: I'dan L'ye",
+    translations: { en: "Group 3: I to L", tr: "Grup 3: I'dan L'ye", fr: "Groupe 3 : I à L" },
+    correctAnswer: "I,İ,J,K,L",
+    options: ["İ", "J", "L", "I", "K"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
+    id: "tr-l1-g4",
+    language: "tr",
+    type: "ordering",
+    sentence: "Grup 4: M'den P'ye",
+    translations: { en: "Group 4: M to P", tr: "Grup 4: M'den P'ye", fr: "Groupe 4 : M à P" },
+    correctAnswer: "M,N,O,Ö,P",
+    options: ["O", "N", "P", "M", "Ö"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
+    id: "tr-l1-vowel-1",
+    language: "tr",
+    type: "choice",
+    sentence: "Hangi harf bir 'sesli harf' (vowel) değildir?",
+    translations: { en: "Which letter is NOT a vowel?", tr: "Hangisi sesli bir harf değildir?", fr: "Quelle lettre n'est pas une voyelle ?" },
+    correctAnswer: "k",
+    options: ["a", "e", "k"],
+    topic: "Alfabe",
+    level: 1
+  },
+
+  // --- TÜRKÇE SEVİYE 2: SAYILAR ---
+  {
+    id: "tr-l2-ord-1",
+    language: "tr",
+    type: "ordering",
+    sentence: "1'den 5'e kadar sayıları sıraya diz!",
+    translations: { en: "Order numbers from 1 to 5!", tr: "1'den 5'e kadar sayıları sıraya diz!", fr: "Ordonnez les nombres de 1 à 5 !" },
+    correctAnswer: "Bir,İki,Üç,Dört,Beş",
+    options: ["İki", "Dört", "Bir", "Beş", "Üç"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-ord-2",
+    language: "tr",
+    type: "ordering",
+    sentence: "6'dan 10'a kadar sayıları sıraya diz!",
+    translations: { en: "Order numbers from 6 to 10!", tr: "6'dan 10'a kadar sayıları sıraya diz!", fr: "Ordonnez les nombres de 6 à 10 !" },
+    correctAnswer: "Altı,Yedi,Sekiz,Dokuz,On",
+    options: ["Dokuz", "Altı", "On", "Yedi", "Sekiz"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-ord-10s",
+    language: "tr",
+    type: "ordering",
+    sentence: "10'ar 10'ar 100'e kadar sayıları sıraya diz!",
+    translations: { en: "Order numbers by 10s up to 100!", tr: "10'ar 10'ar 100'e kadar sayıları sıraya diz!", fr: "Ordonnez les nombres par 10 jusqu'à 100 !" },
+    correctAnswer: "On,Yirmi,Otuz,Kırk,Elli,Altmış,Yetmiş,Seksen,Doksan,Yüz",
+    options: ["Elli", "On", "Altmış", "Doksan", "Yirmi", "Yüz", "Otuz", "Yetmiş", "Seksen", "Kırk"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-choice-1",
+    language: "tr",
+    type: "choice",
+    sentence: "3 sayısının yazılışı hangisidir?",
+    translations: { en: "Number: 3. Which one is the written form?", tr: "3 sayısının yazılışı hangisidir?", fr: "Nombre : 3. Quelle est la forme écrite ?" },
+    correctAnswer: "Üç",
+    options: ["İki", "Üç", "Dört"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-choice-2",
+    language: "tr",
+    type: "choice",
+    sentence: "5 sayısının yazılışı hangisidir?",
+    translations: { en: "Number: 5. Which one is the written form?", tr: "5 sayısının yazılışı hangisidir?", fr: "Nombre : 5. Quelle est la forme écrite ?" },
+    correctAnswer: "Beş",
+    options: ["Beş", "Altı", "Yedi"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-choice-3",
+    language: "tr",
+    type: "choice",
+    sentence: "Yedi sayısının rakamla yazılışı hangisidir?",
+    translations: { en: "Written: 'Yedi'. Which digit is it?", tr: "'Yedi' yazılışı hangi rakamdır?", fr: "Écrit : 'Yedi'. Quel chiffre est-ce ?" },
+    correctAnswer: "7",
+    options: ["6", "7", "8"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-choice-4",
+    language: "tr",
+    type: "choice",
+    sentence: "10 sayısının yazılışı hangisidir?",
+    translations: { en: "Number: 10. Which one is the written form?", tr: "10 sayısının yazılışı hangisidir?", fr: "Nombre : 10. Quelle est la forme écrite ?" },
+    correctAnswer: "On",
+    options: ["On", "Yirmi", "Otuz"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-choice-5",
+    language: "tr",
+    type: "choice",
+    sentence: "20 sayısının yazılışı hangisidir?",
+    translations: { en: "Number: 20. Which one is the written form?", tr: "20 sayısının yazılışı hangisidir?", fr: "Nombre : 20. Quelle est la forme écrite ?" },
+    correctAnswer: "Yirmi",
+    options: ["On", "Yirmi", "Kırk"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-choice-6",
+    language: "tr",
+    type: "choice",
+    sentence: "12 sayısının yazılışı hangisidir?",
+    translations: { en: "Number: 12. Which one is the written form?", tr: "12 sayısının yazılışı hangisidir?", fr: "Nombre : 12. Quelle est la forme écrite ?" },
+    correctAnswer: "On İki",
+    options: ["On İki", "On Bir", "On Üç"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-choice-7",
+    language: "tr",
+    type: "choice",
+    sentence: "100 sayısının yazılışı hangisidir?",
+    translations: { en: "Number: 100. Which one is the written form?", tr: "100 sayısının yazılışı hangisidir?", fr: "Nombre : 100. Quelle est la forme écrite ?" },
+    correctAnswer: "Yüz",
+    options: ["Yüz", "Bin", "On"],
+    topic: "Sayılar",
+    level: 2
+  },
+  {
+    id: "tr-l2-choice-8",
+    language: "tr",
+    type: "choice",
+    sentence: "Elli sayısının sayıyla yazılışı hangisidir?",
+    translations: { en: "Written: 'Fifty'. Which digit is it?", tr: "'Elli' yazılışı hangi rakamdır?", fr: "Écrit : 'Cinquante'. Quel chiffre est-ce ?" },
+    correctAnswer: "50",
+    options: ["40", "50", "60"],
+    topic: "Sayılar",
+    level: 2
+  }
+];
+
+const createLevelWords = (level: number, words: [string, string, string, Category][]): Word[] => {
   return words.map((w, i) => ({
     id: `l${level}-${i}`,
     en: w[0],
     fr: w[1],
     tr: w[2],
-    la: w[3],
-    category: w[4],
+    category: w[3],
     rarity: level
-  }));
+  }))
 };
 
 export const WORD_DATABASE: Word[] = [
-  // SEVİYE 1-2: FİİLLER (Verbs)
-  ...createLevel(1, [
-    ['Go', 'Aller', 'Gitmek', 'Ire', 'Verb'], ['Come', 'Venir', 'Gelmek', 'Venire', 'Verb'], ['Do', 'Faire', 'Yapmak', 'Facere', 'Verb'],
-    ['Say', 'Dire', 'Söylemek', 'Dicere', 'Verb'], ['Give', 'Donner', 'Vermek', 'Dare', 'Verb'], ['Take', 'Prendre', 'Almak', 'Capere', 'Verb'],
-    ['Eat', 'Manger', 'Yemek', 'Edere', 'Verb'], ['Drink', 'Boire', 'İçmek', 'Bibere', 'Verb'], ['Run', 'Courir', 'Koşmak', 'Currere', 'Verb'],
-    ['Walk', 'Marcher', 'Yürümek', 'Ambulare', 'Verb'], ['Jump', 'Sauter', 'Zıplamak', 'Salire', 'Verb'], ['Sleep', 'Dormir', 'Uyumak', 'Dormire', 'Verb'],
-    ['Work', 'Travailler', 'Çalışmak', 'Laborare', 'Verb'], ['Play', 'Jouer', 'Oynamak', 'Ludere', 'Verb'], ['Read', 'Lire', 'Okumak', 'Legere', 'Verb'],
-    ['Write', 'Écrire', 'Yazmak', 'Scribere', 'Verb'], ['Listen', 'Écouter', 'Dinlemek', 'Audire', 'Verb'], ['See', 'Voir', 'Görmek', 'Videre', 'Verb'],
-    ['Hear', 'Entendre', 'Duymak', 'Exaudire', 'Verb'], ['Know', 'Savoir', 'Bilmek', 'Scire', 'Verb'], ['Think', 'Penser', 'Düşünmek', 'Putare', 'Verb'],
-    ['Buy', 'Acheter', 'Satın almak', 'Emere', 'Verb'], ['Sell', 'Vendre', 'Satmak', 'Vendere', 'Verb'], ['Find', 'Trouver', 'Bulmak', 'Invenire', 'Verb'],
-    ['Lose', 'Perdre', 'Kaybetmek', 'Amittere', 'Verb'], ['Make', 'Fabriquer', 'Üretmek', 'Creare', 'Verb'], ['Build', 'Construire', 'İnşa etmek', 'Aedificare', 'Verb'],
-    ['Choose', 'Choisir', 'Seçmek', 'Eligere', 'Verb'], ['Call', 'Appeler', 'Aramak', 'Vocare', 'Verb'], ['Clean', 'Nettoyer', 'Temizlemek', 'Purgare', 'Verb'],
-    ['Drive', 'Conduire', 'Sürmek', 'Agere', 'Verb'], ['Cook', 'Cuisiner', 'Pişirmek', 'Coquere', 'Verb'], ['Bake', 'Cuire au four', 'Fırınlamak', 'Torrere', 'Verb'],
-    ['Cut', 'Couper', 'Kesmek', 'Secare', 'Verb'], ['Draw', 'Dessiner', 'Çizmek', 'Pingere', 'Verb'], ['Dream', 'Rêver', 'Rüya görmek', 'Somniare', 'Verb'],
-    ['Dress', 'S\'habiller', 'Giyinmek', 'Induere', 'Verb'], ['Fall', 'Tomber', 'Düşmek', 'Cadere', 'Verb'], ['Feel', 'Sentir', 'Hissetmek', 'Sentire', 'Verb'],
-    ['Fight', 'Se battre', 'Dövüşmek', 'Pugnare', 'Verb'], ['Fly', 'Voler', 'Uçmak', 'Volare', 'Verb'], ['Grow', 'Grandir', 'Büyümek', 'Crescere', 'Verb'],
-    ['Hold', 'Tenir', 'Tutmak', 'Tenere', 'Verb'], ['Keep', 'Garder', 'Tutmak', 'Servare', 'Verb'], ['Laugh', 'Rire', 'Gülmek', 'Ridere', 'Verb'],
-    ['Learn', 'Apprendre', 'Öğrenmek', 'Discere', 'Verb'], ['Leave', 'Partir', 'Ayrılmak', 'Relinquere', 'Verb'], ['Look', 'Regarder', 'Bakmak', 'Spectare', 'Verb'],
-    ['Love', 'Aimer', 'Sevmek', 'Amare', 'Verb'], ['Move', 'Bouger', 'Hareket etmek', 'Movere', 'Verb']
-  ]),
-  ...createLevel(2, [
-    ['Begin', 'Commencer', 'Başlamak', 'Incipere', 'Verb'], ['Finish', 'Finir', 'Bitirmek', 'Finire', 'Verb'], ['Open', 'Ouvrir', 'Açmak', 'Aperire', 'Verb'],
-    ['Close', 'Fermer', 'Kapatmak', 'Claudere', 'Verb'], ['Stop', 'Arrêter', 'Durdurmak', 'Sistere', 'Verb'], ['Start', 'Démarrer', 'Başlatmak', 'Initiare', 'Verb'],
-    ['Wait', 'Attendre', 'Beklemek', 'Exspectare', 'Verb'], ['Ask', 'Demander', 'Sormak', 'Rogare', 'Verb'], ['Answer', 'Répondre', 'Cevaplamak', 'Respondere', 'Verb'],
-    ['Help', 'Aider', 'Yardım etmek', 'Adiuvare', 'Verb'], ['Understand', 'Comprendre', 'Anlamak', 'Intellegere', 'Verb'], ['Remember', 'Se souvenir', 'Hatırlamak', 'Meminisse', 'Verb'],
-    ['Forget', 'Oublier', 'Unutmak', 'Oblivisci', 'Verb'], ['Wash', 'Laver', 'Yıkamak', 'Lavare', 'Verb'], ['Fix', 'Réparer', 'Tamir etmek', 'Reficere', 'Verb'],
-    ['Bring', 'Apporter', 'Getirmek', 'Afferre', 'Verb'], ['Send', 'Envoyer', 'Göndermek', 'Mittere', 'Verb'], ['Change', 'Changer', 'Değiştirmek', 'Mutare', 'Verb'],
-    ['Smile', 'Sourire', 'Gülümsemek', 'Ridere', 'Verb'], ['Touch', 'Toucher', 'Dokunmak', 'Tangere', 'Verb'], ['Taste', 'Goûter', 'Tadına bakmak', 'Gustare', 'Verb'],
-    ['Smell', 'Sentir', 'Koklamak', 'Olfacere', 'Verb'], ['Watch', 'Regarder', 'İzlemek', 'Vigilare', 'Verb'], ['Push', 'Pousser', 'İtmek', 'Trudere', 'Verb'],
-    ['Pull', 'Tirer', 'Çekmek', 'Trahere', 'Verb'], ['Sing', 'Chanter', 'Şarkı söylemek', 'Canere', 'Verb'], ['Dance', 'Danser', 'Dans etmek', 'Saltare', 'Verb'],
-    ['Swim', 'Nager', 'Yüzmek', 'Natare', 'Verb'], ['Climb', 'Grimper', 'Tırmanmak', 'Scandere', 'Verb'], ['Travel', 'Voyager', 'Seyahat etmek', 'Iter facere', 'Verb'],
-    ['Visit', 'Visiter', 'Ziyaret etmek', 'Visitare', 'Verb'], ['Stay', 'Rester', 'Kalmak', 'Manere', 'Verb'], ['Wake', 'Se réveiller', 'Uyanmak', 'Excitare', 'Verb'],
-    ['Sit', 'S\'asseoir', 'Oturmak', 'Sedere', 'Verb'], ['Stand', 'Se tenir debout', 'Ayakta durmak', 'Stare', 'Verb'], ['Believe', 'Croire', 'İnanmak', 'Credere', 'Verb'],
-    ['Hope', 'Espérer', 'Ummak', 'Sperare', 'Verb'], ['Try', 'Essayer', 'Denemek', 'Conari', 'Verb'], ['Win', 'Gagner', 'Kazanmak', 'Vincere', 'Verb'],
-    ['Live', 'Vivre', 'Yaşamak', 'Vivere', 'Verb'], ['Die', 'Mourir', 'Ölmek', 'Mori', 'Verb'], ['Show', 'Montrer', 'Göstermek', 'Monstrare', 'Verb'],
-    ['Hide', 'Cacher', 'Gizlemek', 'Celare', 'Verb'], ['Teach', 'Enseigner', 'Öğretmek', 'Docere', 'Verb'], ['Practice', 'Pratiquer', 'Pratik yapmak', 'Exercere', 'Verb'],
-    ['Solve', 'Résoudre', 'Çözmek', 'Solvere', 'Verb'], ['Seek', 'Chercher', 'Aramak', 'Petere', 'Verb'], ['Lead', 'Mener', 'Yönetmek', 'Ducere', 'Verb'],
-    ['Follow', 'Suivre', 'Takip etmek', 'Sequi', 'Verb'], ['Create', 'Créer', 'Yaratmak', 'Creare', 'Verb']
-  ]),
-
-  // SEVİYE 3-4: EV (Home)
-  ...createLevel(3, [
-    ['House', 'Maison', 'Ev', 'Domus', 'Noun'], ['Room', 'Chambre', 'Oda', 'Cubiculum', 'Noun'], ['Kitchen', 'Cuisine', 'Mutfak', 'Culina', 'Noun'],
-    ['Bed', 'Lit', 'Yatak', 'Lectus', 'Noun'], ['Chair', 'Chaise', 'Sandalye', 'Sella', 'Noun'], ['Table', 'Table', 'Masa', 'Mensa', 'Noun'],
-    ['Door', 'Porte', 'Kapı', 'Janua', 'Noun'], ['Window', 'Fenêtre', 'Pencere', 'Fenestra', 'Noun'], ['Wall', 'Mur', 'Duvar', 'Murus', 'Noun'],
-    ['Floor', 'Sol', 'Zemin', 'Pavimentum', 'Noun'], ['Ceiling', 'Plafond', 'Tavan', 'Tectum', 'Noun'], ['Key', 'Clé', 'Anahtar', 'Clavis', 'Noun'],
-    ['Lock', 'Serrure', 'Kilit', 'Sera', 'Noun'], ['Mirror', 'Miroir', 'Ayna', 'Speculum', 'Noun'], ['Curtain', 'Rideau', 'Perde', 'Vela', 'Noun'],
-    ['Lamp', 'Lampe', 'Lamba', 'Lucerna', 'Noun'], ['Shelf', 'Étagère', 'Raf', 'Pluteus', 'Noun'], ['Drawer', 'Tiroir', 'Çekmece', 'Capsula', 'Noun'],
-    ['Pillow', 'Oreiller', 'Yastık', 'Pulvinus', 'Noun'], ['Blanket', 'Couverture', 'Battaniye', 'Lodix', 'Noun'], ['Wardrobe', 'Armoire', 'Gardırop', 'Armarium', 'Noun'],
-    ['Bathroom', 'Salle de bain', 'Banyo', 'Balneum', 'Noun'], ['Toilet', 'Toilettes', 'Tuvalet', 'Latrina', 'Noun'], ['Shower', 'Douche', 'Duş', 'Impluvium', 'Noun'],
-    ['Soap', 'Savon', 'Sabun', 'Sapo', 'Noun'], ['Carpet', 'Tapis', 'Halı', 'Tapes', 'Noun'], ['Roof', 'Toit', 'Çatı', 'Tectum', 'Noun'],
-    ['Chimney', 'Cheminée', 'Baca', 'Caminus', 'Noun'], ['Stairs', 'Escaliers', 'Merdivenler', 'Scalae', 'Noun'], ['Balcony', 'Balcon', 'Balkon', 'Maenianum', 'Noun'],
-    ['Garden', 'Jardin', 'Bahçe', 'Hortus', 'Noun'], ['Fence', 'Clôture', 'Çit', 'Saepes', 'Noun'], ['Gate', 'Porte', 'Kapı', 'Porta', 'Noun'],
-    ['Vase', 'Vase', 'Vazo', 'Vas', 'Noun'], ['Painting', 'Tableau', 'Tablo', 'Pictura', 'Noun'], ['Clock', 'Horloge', 'Saat', 'Horologium', 'Noun'],
-    ['Fan', 'Ventilateur', 'Vantilatör', 'Flabellum', 'Noun'], ['Radiator', 'Radiateur', 'Radyatör', 'Calefactorium', 'Noun'], ['Plug', 'Prise', 'Fiş', 'Connexio', 'Noun'],
-    ['Light', 'Lumière', 'Işık', 'Lux', 'Noun'], ['Couch', 'Canapé', 'Kanepe', 'Lectulus', 'Noun'], ['Armchair', 'Fauteuil', 'Tekli koltuk', 'Cathedra', 'Noun'],
-    ['Desks', 'Bureaux', 'Masalar', 'Scrinia', 'Noun'], ['Sofa', 'Sofa', 'Koltuk', 'Sofa', 'Noun'], ['Cushion', 'Coussin', 'Minder', 'Pulvinulus', 'Noun'],
-    ['Ashtray', 'Cendrier', 'Küllük', 'Vascullum', 'Noun'], ['Trash can', 'Poubelle', 'Çöp kutusu', 'Corbis', 'Noun'], ['Hallway', 'Couloir', 'Koridor', 'Andron', 'Noun'],
-    ['Basement', 'Sous-sol', 'Bodrum', 'Hypogeum', 'Noun'], ['Attic', 'Grenier', 'Tavan arası', 'Cenaculum', 'Noun']
-  ]),
-  ...createLevel(4, [
-    ['Plate', 'Assiette', 'Tabak', 'Patina', 'Noun'], ['Bowl', 'Bol', 'Kase', 'Crater', 'Noun'], ['Cup', 'Tasse', 'Fincan', 'Poculum', 'Noun'],
-    ['Glass', 'Verre', 'Bardak', 'Vitrum', 'Noun'], ['Fork', 'Fourchette', 'Çatal', 'Furca', 'Noun'], ['Knife', 'Couteau', 'Bıçak', 'Culter', 'Noun'],
-    ['Spoon', 'Cuillère', 'Kaşık', 'Cochlear', 'Noun'], ['Pot', 'Marmite', 'Tencere', 'Olla', 'Noun'], ['Pan', 'Poêle', 'Tava', 'Sartago', 'Noun'],
-    ['Fridge', 'Frigo', 'Buzdolabı', 'Frigidarium', 'Noun'], ['Oven', 'Four', 'Fırın', 'Furnus', 'Noun'], ['Stove', 'Cuisinière', 'Ocak', 'Focus', 'Noun'],
-    ['Sink', 'Évier', 'Lavabo', 'Labrum', 'Noun'], ['Towel', 'Serviette', 'Havlu', 'Linteum', 'Noun'], ['Brush', 'Brosse', 'Fırça', 'Scopula', 'Noun'],
-    ['Comb', 'Peigne', 'Tarak', 'Pecten', 'Noun'], ['Shampoo', 'Shampooing', 'Şampuan', 'Capillocustodia', 'Noun'], ['Hammer', 'Marteau', 'Çekiç', 'Malleus', 'Noun'],
-    ['Screwdriver', 'Tournevis', 'Tornavida', 'Tornus', 'Noun'], ['Ladder', 'Échelle', 'Merdiven', 'Scalae', 'Noun'], ['Garden', 'Jardin', 'Bahçe', 'Hortus', 'Noun'],
-    ['Toaster', 'Grille-pain', 'Ekmek kızartma makinesi', 'Torrarium', 'Noun'], ['Microwave', 'Micro-ondes', 'Mikrodalga', 'Microunda', 'Noun'], ['Blender', 'Mélangeur', 'Blender', 'Mixarium', 'Noun'],
-    ['Kettle', 'Bouilloire', 'Su ısıtıcısı', 'Cucuma', 'Noun'], ['Teapot', 'Théière', 'Çaydanlık', 'Thearium', 'Noun'], ['Tray', 'Plateau', 'Tepsi', 'Ferculum', 'Noun'],
-    ['Napkin', 'Serviette', 'Peçete', 'Mappa', 'Noun'], ['Jug', 'Carafe', 'Sürahi', 'Urceus', 'Noun'], ['Broom', 'Balai', 'Süpürge', 'Scopae', 'Noun'],
-    ['Mop', 'Serpillière', 'Vileda', 'Mappa pavimenti', 'Noun'], ['Iron', 'Fer à repasser', 'Ütü', 'Ferrum prementium', 'Noun'], ['Dishwasher', 'Lave-vaisselle', 'Bulaşık makinesi', 'Patinalavator', 'Noun'],
-    ['Washer', 'Lave-linge', 'Çamaşır makinesi', 'Vestilavator', 'Noun'], ['Dryer', 'Sèche-linge', 'Kurutma makinesi', 'Siccatrix', 'Noun'], ['Vacuum', 'Aspirateur', 'Elektrik süpürgesi', 'Pulveris hauritor', 'Noun'],
-    ['Bucket', 'Seau', 'Kova', 'Situla', 'Noun'], ['Hose', 'Tuyau', 'Hortum', 'Sipho', 'Noun'], ['Tools', 'Outils', 'Aletler', 'Instrumenta', 'Noun'],
-    ['Screw', 'Vis', 'Vida', 'Cochlea', 'Noun'], ['Nail', 'Clou', 'Çivi', 'Clavus', 'Noun'], ['Saw', 'Scie', 'Testere', 'Serra', 'Noun'],
-    ['Drill', 'Perceuse', 'Matkap', 'Terebra', 'Noun'], ['Gloves', 'Gants', 'Eldivenler', 'Chirothecae', 'Noun'], ['Candle', 'Bougie', 'Mum', 'Candela', 'Noun'],
-    ['Match', 'Allumette', 'Kibrit', 'Sulphuratum', 'Noun'], ['Flashlight', 'Lampe de poche', 'El feneri', 'Fax electrica', 'Noun'], ['Battery', 'Pile', 'Pil', 'Accumulatrum', 'Noun'],
-    ['Tape', 'Ruban adhésif', 'Bant', 'Taenia', 'Noun'], ['Glue', 'Colle', 'Yapıştırıcı', 'Gluten', 'Noun']
-  ]),
-
-  // SEVİYE 5-6: OKUL (School)
-  ...createLevel(5, [
-    ['School', 'École', 'Okul', 'Schola', 'Noun'], ['Teacher', 'Professeur', 'Öğretmen', 'Magister', 'Noun'], ['Student', 'Étudiant', 'Öğrenci', 'Discipulus', 'Noun'],
-    ['Classroom', 'Salle de classe', 'Sınıf', 'Tablinum', 'Noun'], ['Desk', 'Bureau', 'Sıra', 'Scrinium', 'Noun'], ['Book', 'Livre', 'Kitap', 'Liber', 'Noun'],
-    ['Notebook', 'Cahier', 'Defter', 'Commentarium', 'Noun'], ['Pen', 'Stylo', 'Kalem', 'Penna', 'Noun'], ['Pencil', 'Crayon', 'Kurşun kalem', 'Stilus', 'Noun'],
-    ['Eraser', 'Gomme', 'Silgi', 'Erasorium', 'Noun'], ['Ruler', 'Règle', 'Cetvel', 'Regula', 'Noun'], ['Backpack', 'Sac à dos', 'Sırt çantası', 'Saccus dorsualis', 'Noun'],
-    ['Paper', 'Papier', 'Kağıt', 'Papyrus', 'Noun'], ['Board', 'Tableau', 'Tahta', 'Tabula', 'Noun'], ['Marker', 'Feutre', 'Marker', 'Graphiolum', 'Noun'],
-    ['Exam', 'Examen', 'Sınav', 'Examen', 'Noun'], ['Grade', 'Note', 'Not', 'Gradus', 'Noun'], ['Lesson', 'Leçon', 'Ders', 'Lectio', 'Noun'],
-    ['Homework', 'Devoirs', 'Ödev', 'Pensum', 'Noun'], ['Library', 'Bibliothèque', 'Kütüphane', 'Bibliotheca', 'Noun'], ['Subject', 'Sujet', 'Konu', 'Materia', 'Noun'],
-    ['Dictionary', 'Dictionnaire', 'Sözlük', 'Dictionarium', 'Noun'], ['Map', 'Carte', 'Harita', 'Charta', 'Noun'], ['Glue', 'Colle', 'Yapıştırıcı', 'Gluten', 'Noun'],
-    ['Scissors', 'Ciseaux', 'Makas', 'Forfex', 'Noun'], ['Sharpener', 'Taille-crayon', 'Kalemtraş', 'Acuminarium', 'Noun'], ['Stapler', 'Agrafeuse', 'Zımba', 'Fibula', 'Noun'],
-    ['Clip', 'Trombone', 'Ataç', 'Uncus', 'Noun'], ['Folder', 'Dossier', 'Dosya', 'Theca', 'Noun'], ['Calculator', 'Calculatrice', 'Hesap makinesi', 'Abacus', 'Noun'],
-    ['Compass', 'Compas', 'Pergel', 'Circinus', 'Noun'], ['Globe', 'Globe', 'Küre', 'Globus', 'Noun'], ['Poster', 'Affiche', 'Poster', 'Libellus', 'Noun'],
-    ['Locker', 'Casier', 'Dolap', 'Armariolum', 'Noun'], ['Bell', 'Cloche', 'Zil', 'Tintinnabulum', 'Noun'], ['Principal', 'Directeur', 'Müdür', 'Rector', 'Noun'],
-    ['Coach', 'Entraîneur', 'Antrenör', 'Exercitator', 'Noun'], ['Campus', 'Campus', 'Kampüs', 'Campus', 'Noun'], ['Hallway', 'Couloir', 'Koridor', 'Andron', 'Noun'],
-    ['Laboratory', 'Laboratoire', 'Laboratuvar', 'Laboratorium', 'Noun'], ['Science', 'Science', 'Fen', 'Scientia', 'Noun'], ['Break', 'Pause', 'Mola', 'Intermissio', 'Noun'],
-    ['Projector', 'Projecteur', 'Projeksiyon', 'Projectorium', 'Noun'], ['Notebook', 'Cahier', 'Defter', 'Commentarium', 'Noun'], ['Paint', 'Peinture', 'Boya', 'Pigmentum', 'Noun'],
-    ['Crayons', 'Crayons de couleur', 'Pastel boyalar', 'Graphidei colorati', 'Noun'], ['Chalk', 'Craie', 'Tebeşir', 'Creta', 'Noun'], ['Diploma', 'Diplôme', 'Diploma', 'Diploma', 'Noun'],
-    ['Scholarship', 'Bourse', 'Burs', 'Stipendium', 'Noun'], ['Attendance', 'Présence', 'Yoklama', 'Praesentia', 'Noun']
-  ]),
-  ...createLevel(6, [
-    ['History', 'Histoire', 'Tarih', 'Historia', 'Noun'], ['Geography', 'Géographie', 'Coğrafya', 'Geographia', 'Noun'], ['Science', 'Science', 'Fen', 'Scientia', 'Noun'],
-    ['Math', 'Mathématiques', 'Matematik', 'Mathematica', 'Noun'], ['Art', 'Art', 'Resim', 'Ars', 'Noun'], ['Music', 'Musique', 'Müzik', 'Musica', 'Noun'],
-    ['Sport', 'Sport', 'Spor', 'Ludus', 'Noun'], ['Biology', 'Biologie', 'Biyoloji', 'Biologia', 'Noun'], ['Chemistry', 'Chimie', 'Kimya', 'Chemia', 'Noun'],
-    ['Physics', 'Physique', 'Fizik', 'Physica', 'Noun'], ['Literature', 'Littérature', 'Edebiyat', 'Litterae', 'Noun'], ['Grammar', 'Grammaire', 'Dilbilgisi', 'Grammatica', 'Noun'],
-    ['Philosophy', 'Philosophie', 'Felsefe', 'Philosophia', 'Noun'], ['Economics', 'Économie', 'Ekonomi', 'Oeconomia', 'Noun'], ['Lecture', 'Conférence', 'Konferans', 'Acromata', 'Noun'],
-    ['Seminar', 'Séminaire', 'Seminer', 'Seminarium', 'Noun'], ['Exercise', 'Exercice', 'Alıştırma', 'Exercitium', 'Noun'], ['Question', 'Question', 'Soru', 'Quaestio', 'Noun'],
-    ['Answer', 'Réponse', 'Cevap', 'Responsum', 'Noun'], ['Test', 'Test', 'Test', 'Probatio', 'Noun'], ['Review', 'Révision', 'Tekrar', 'Recognitio', 'Noun'],
-    ['Knowledge', 'Connaissance', 'Bilgi', 'Scientia', 'Noun'], ['Discovery', 'Découverte', 'Keşif', 'Inventio', 'Noun'], ['Study', 'Étude', 'Çalışma', 'Studium', 'Noun'],
-    ['Research', 'Recherche', 'Araştırma', 'Investigatio', 'Noun'], ['Thesis', 'Thèse', 'Tez', 'Thesis', 'Noun'], ['Semester', 'Semestre', 'Dönem', 'Semestris', 'Noun'],
-    ['Schedule', 'Emploi du temps', 'Program', 'Tabula temporis', 'Noun'], ['Meeting', 'Réunion', 'Toplantı', 'Conventus', 'Noun'], ['Activity', 'Activité', 'Etkinlik', 'Activitatis', 'Noun'],
-    ['Club', 'Club', 'Kulüp', 'Sodalitas', 'Noun'], ['Team', 'Équipe', 'Takım', 'Grex', 'Noun'], ['Event', 'Événement', 'Etkinlik', 'Eventus', 'Noun'],
-    ['Competition', 'Compétition', 'Yarışma', 'Certamen', 'Noun'], ['Medal', 'Médaille', 'Madalya', 'Numisma', 'Noun'], ['Prize', 'Prix', 'Ödül', 'Praemium', 'Noun'],
-    ['Ceremony', 'Cérémonie', 'Tören', 'Caerimonia', 'Noun'], ['Uniform', 'Uniforme', 'Üniforma', 'Vestitus uniformis', 'Noun'], ['Bag', 'Sac', 'Çanta', 'Sacculus', 'Noun'],
-    ['Holiday', 'Vacances', 'Tatil', 'Feriae', 'Noun'], ['Success', 'Succès', 'Başarı', 'Successus', 'Noun'], ['Fail', 'Échec', 'Başarısızlık', 'Defectus', 'Noun'],
-    ['Rules', 'Règles', 'Kurallar', 'Regulae', 'Noun'], ['Classmate', 'Camarade de classe', 'Sınıf arkadaşı', 'Condiscipulus', 'Noun'], ['Reading', 'Lecture', 'Okuma', 'Lectio', 'Noun'],
-    ['Writing', 'Écriture', 'Yazma', 'Scriptio', 'Noun'], ['Speaking', 'Parole', 'Konuşma', 'Locutio', 'Noun'], ['Listening', 'Écoute', 'Dinleme', 'Auditio', 'Noun'],
-    ['Translation', 'Traduction', 'Çeviri', 'Interpretatio', 'Noun'], ['Vocabulary', 'Vocabulaire', 'Kelime hazinesi', 'Vocabularium', 'Noun']
-  ]),
-
-  // SEVİYE 7-8: ALIŞVERİŞ & HAVALİMANI
-  ...createLevel(7, [
-    ['Market', 'Marché', 'Market', 'Mercatus', 'Noun'], ['Price', 'Prix', 'Fiyat', 'Pretium', 'Noun'], ['Money', 'Argent', 'Para', 'Pecunia', 'Noun'],
-    ['Cash', 'Espèces', 'Nakit', 'Numerata', 'Noun'], ['Card', 'Carte', 'Kart', 'Charta debitoria', 'Noun'], ['Bag', 'Sac', 'Çanta', 'Saccus', 'Noun'],
-    ['Bread', 'Pain', 'Ekmek', 'Panis', 'Noun'], ['Milk', 'Lait', 'Süt', 'Lac', 'Noun'], ['Egg', 'Œuf', 'Yumurta', 'Ovum', 'Noun'],
-    ['Cheese', 'Fromage', 'Peynir', 'Caseus', 'Noun'], ['Meat', 'Viande', 'Et', 'Caro', 'Noun'], ['Chicken', 'Poulet', 'Tavuk', 'Pullus', 'Noun'],
-    ['Butcher', 'Boucher', 'Kasap', 'Lanius', 'Noun'], ['Fish', 'Poisson', 'Balık', 'Piscis', 'Noun'], ['Sugar', 'Sucre', 'Şeker', 'Saccharum', 'Noun'],
-    ['Salt', 'Sel', 'Tuz', 'Sal', 'Noun'], ['Water', 'Eau', 'Su', 'Aqua', 'Noun'], ['Juice', 'Jus', 'Meyve suyu', 'Succus', 'Noun'],
-    ['Buy', 'Acheter', 'Satın almak', 'Emere', 'Verb'], ['Sell', 'Vendre', 'Satmak', 'Vendere', 'Verb'], ['Cheap', 'Bon marché', 'Ucuz', 'Vilis', 'Adjective'],
-    ['Expensive', 'Cher', 'Pahalı', 'Pretiosus', 'Adjective'], ['Discount', 'Remise', 'İndirim', 'Deductio', 'Noun'], ['Receipt', 'Reçu', 'Fiş', 'Apochas', 'Noun'],
-    ['Customer', 'Client', 'Müşteri', 'Emptor', 'Noun'], ['Shop', 'Magasin', 'Dükkan', 'Taberna', 'Noun'], ['Store', 'Boutique', 'Mağaza', 'Emporium', 'Noun'],
-    ['Grocery', 'Épicerie', 'Bakkal', 'Penus', 'Noun'], ['Shelf', 'Étagère', 'Raf', 'Pluteus', 'Noun'], ['Aisle', 'Allée', 'Reyon', 'Semita', 'Noun'],
-    ['Cart', 'Chariot', 'Sepet', 'Carrulus', 'Noun'], ['Basket', 'Panier', 'Sepet', 'Canistrum', 'Noun'], ['Counter', 'Comptoir', 'Tezgah', 'Abacus', 'Noun'],
-    ['Queue', 'File d\'attente', 'Sıra', 'Linea', 'Noun'], ['Worker', 'Travailleur', 'Çalışan', 'Operarius', 'Noun'], ['Change', 'Monnaie', 'Para üstü', 'Stips', 'Noun'],
-    ['Coin', 'Pièce', 'Madeni para', 'Nummus', 'Noun'], ['Bill', 'Billet', 'Banknot', 'Charta nummaria', 'Noun'], ['Wallet', 'Portefeuille', 'Cüzdan', 'Marsupium', 'Noun'],
-    ['Price tag', 'Étiquette de prix', 'Fiyat etiketi', 'Pittacium', 'Noun'], ['Total', 'Total', 'Toplam', 'Summa', 'Noun'], ['Pay', 'Payer', 'Ödemek', 'Solvere', 'Verb'],
-    ['Scan', 'Scanner', 'Tarama', 'Lustrare', 'Verb'], ['Delivery', 'Livraison', 'Teslimat', 'Redditio', 'Noun'], ['Offer', 'Offre', 'Teklif', 'Oblatio', 'Noun'],
-    ['Box', 'Boîte', 'Kutu', 'Capsa', 'Noun'], ['Packet', 'Paquet', 'Paket', 'Fasciculus', 'Noun'], ['Bottle', 'Bouteille', 'Şişe', 'Lagena', 'Noun'],
-    ['Can', 'Canette', 'Teneke kutu', 'Vascullum stanneum', 'Noun'], ['Bag', 'Sac', 'Çanta', 'Saccus', 'Noun']
-  ]),
-  ...createLevel(8, [
-    ['Airport', 'Aéroport', 'Havalimanı', 'Aeroportus', 'Noun'], ['Plane', 'Avion', 'Uçak', 'Aeroplanum', 'Noun'], ['Ticket', 'Billet', 'Bilet', 'Tessera', 'Noun'],
-    ['Passport', 'Passeport', 'Pasaport', 'Syngraphus', 'Noun'], ['Luggage', 'Bagage', 'Bagaj', 'Impedimenta', 'Noun'], ['Suitcase', 'Valise', 'Valiz', 'Riscus', 'Noun'],
-    ['Check-in', 'Enregistrement', 'Kayıt', 'Inscriptio', 'Noun'], ['Flight', 'Vol', 'Uçuş', 'Volatus', 'Noun'], ['Pilot', 'Pilote', 'Pilot', 'Gubernator', 'Noun'],
-    ['Gate', 'Porte', 'Kapı', 'Porta', 'Noun'], ['Seat', 'Siège', 'Koltuk', 'Sedes', 'Noun'], ['Arrival', 'Arrivée', 'Varış', 'Adventus', 'Noun'],
-    ['Departure', 'Départ', 'Kalkış', 'Profectio', 'Noun'], ['Delay', 'Retard', 'Gecikme', 'Mora', 'Noun'], ['Belt', 'Ceinture', 'Kemer', 'Cingulum', 'Noun'],
-    ['Window', 'Fenêtre', 'Pencere', 'Fenestra', 'Noun'], ['Exit', 'Sortie', 'Çıkış', 'Exitus', 'Noun'], ['Control', 'Contrôle', 'Kontrol', 'Inspectio', 'Noun'],
-    ['Customs', 'Douane', 'Gümrük', 'Teloneum', 'Noun'], ['Passenger', 'Passager', 'Yolcu', 'Vector', 'Noun'], ['Security', 'Sécurité', 'Güvenlik', 'Securitas', 'Noun'],
-    ['Duty-free', 'Hors taxes', 'Gümrüksüz', 'Immune', 'Adjective'], ['Terminal', 'Terminal', 'Terminal', 'Terminus', 'Noun'], ['Lounge', 'Salon', 'Bekleme salonu', 'Exedra', 'Noun'],
-    ['Runway', 'Piste', 'Pist', 'Via volatica', 'Noun'], ['Take-off', 'Décollage', 'Kalkış', 'Avolatio', 'Noun'], ['Landing', 'Atterrissage', 'İniş', 'Appulsus', 'Noun'],
-    ['Visa', 'Visa', 'Vize', 'Viza', 'Noun'], ['Stamp', 'Timbre', 'Mühür', 'Sigillum', 'Noun'], ['Baggage claim', 'Récupération des bagages', 'Bagaj alımı', 'Redemptio impedimentorum', 'Noun'],
-    ['Boarding pass', 'Carte d\'embarquement', 'Biniş kartı', 'Charta conscensionis', 'Noun'], ['Coach', 'Économique', 'Ekonomi sınıfı', 'Classis oeconomica', 'Noun'], ['First class', 'Première classe', 'Birinci sınıf', 'Classis optima', 'Noun'],
-    ['Cabin', 'Cabine', 'Kabin', 'Cabina', 'Noun'], ['Crew', 'Équipage', 'Mürettebat', 'Nautae', 'Noun'], ['Stewardess', 'Hôtesse de l\'air', 'Hostes', 'Ministra', 'Noun'],
-    ['Travel', 'Voyage', 'Seyahat', 'Iter', 'Noun'], ['Flight number', 'Numéro de vol', 'Uçuş numarası', 'Numerus volatus', 'Noun'], ['Delay', 'Retard', 'Gecikme', 'Mora', 'Noun'],
-    ['Cancel', 'Annuler', 'İptal etmek', 'Rescindere', 'Verb'], ['Book', 'Réserver', 'Rezervasyon yapmak', 'Praenotare', 'Verb'], ['Announcement', 'Annonce', 'Duyuru', 'Edictum', 'Noun'],
-    ['Sky', 'Ciel', 'Gökyüzü', 'Caelum', 'Noun'], ['Clouds', 'Nuages', 'Bulutlar', 'Nubes', 'Noun'], ['Ocean', 'Océan', 'Okyanus', 'Oceanus', 'Noun'],
-    ['Destination', 'Destination', 'Varış noktası', 'Meta', 'Noun'], ['Map', 'Carte', 'Harita', 'Charta', 'Noun'], ['Souvenir', 'Souvenir', 'Hediyelik eşya', 'Pignus amicitiae', 'Noun'],
-    ['Tourist', 'Touriste', 'Turist', 'Peregrinator', 'Noun'], ['Information', 'Information', 'Bilgi', 'Indicia', 'Noun']
-  ]),
-
-  // SEVİYE 9-10: ULAŞIM & ELEKTRONİK
-  ...createLevel(9, [
-    ['Car', 'Voiture', 'Araba', 'Carrus', 'Noun'], ['Bus', 'Bus', 'Otobüs', 'Autoraeda', 'Noun'], ['Truck', 'Camion', 'Kamyon', 'Autocinetum onerarium', 'Noun'],
-    ['Train', 'Train', 'Tren', 'Tramen', 'Noun'], ['Bike', 'Vélo', 'Bisiklet', 'Birota', 'Noun'], ['Motorcycle', 'Moto', 'Motosiklet', 'Motorbirota', 'Noun'],
-    ['Boat', 'Bateau', 'Tekne', 'Linter', 'Noun'], ['Ship', 'Navire', 'Gemi', 'Navis', 'Noun'], ['Wheel', 'Roue', 'Tekerlek', 'Rota', 'Noun'],
-    ['Engine', 'Moteur', 'Motor', 'Machina', 'Noun'], ['Brake', 'Frein', 'Fren', 'Sufflamen', 'Noun'], ['Road', 'Route', 'Yol', 'Via', 'Noun'],
-    ['Street', 'Rue', 'Sokak', 'Vicus', 'Noun'], ['Traffic', 'Trafik', 'Trafik', 'Frequentia vehiculorum', 'Noun'], ['Light', 'Feu', 'Işık', 'Lux', 'Noun'],
-    ['Sign', 'Signe', 'Tabela', 'Signum', 'Noun'], ['Bridge', 'Pont', 'Köprü', 'Pons', 'Noun'], ['Tunnel', 'Tunnel', 'Tünel', 'Cuniculus', 'Noun'],
-    ['Garage', 'Garage', 'Garaj', 'Receptaculum', 'Noun'], ['Parking', 'Parking', 'Otopark', 'Statio vehiculorum', 'Noun'], ['Driver', 'Chauffeur', 'Sürücü', 'Auriga', 'Noun'],
-    ['Passenger', 'Passager', 'Yolcu', 'Vector', 'Noun'], ['Gas', 'Essence', 'Benzin', 'Benzinum', 'Noun'], ['Station', 'Station', 'İstasyon', 'Statio', 'Noun'],
-    ['Highway', 'Autoroute', 'Otoyol', 'Autovia', 'Noun'], ['Subway', 'Métro', 'Metro', 'Ferrovia subterranea', 'Noun'], ['Tram', 'Tramway', 'Tramvay', 'Tramvia', 'Noun'],
-    ['Helicopter', 'Hélicoptère', 'Helikopter', 'Helicopterum', 'Noun'], ['Bicycle', 'Bicyclette', 'Bisiklet', 'Birota', 'Noun'], ['Scooter', 'Scooter', 'Skuter', 'Arcera', 'Noun'],
-    ['Ambulance', 'Ambulance', 'Ambulans', 'Arcera aegrotorum', 'Noun'], ['Taxi', 'Taxi', 'Taksi', 'Taxiraeda', 'Noun'], ['Route', 'Route', 'Rota', 'Iter', 'Noun'],
-    ['Map', 'Carte', 'Harita', 'Tabula', 'Noun'], ['Speed', 'Vitesse', 'Hız', 'Velocitas', 'Noun'], ['Accident', 'Accident', 'Kaza', 'Casus', 'Noun'],
-    ['Danger', 'Danger', 'Tehlike', 'Periculum', 'Noun'], ['Warning', 'Avertissement', 'Uyarı', 'Monitio', 'Noun'], ['Lane', 'Voie', 'Şerit', 'Limes', 'Noun'],
-    ['Intersection', 'Intersection', 'Kavşak', 'Compitum', 'Noun'], ['Crosswalk', 'Passage piétons', 'Yaya geçidi', 'Transitus pedestrium', 'Noun'], ['Sidewalk', 'Trottoir', 'Kaldırım', 'Crepido', 'Noun'],
-    ['Pavement', 'Chaussée', 'Asfalt', 'Pavimentum', 'Noun'], ['Ticket', 'Billet', 'Bilet', 'Tessera', 'Noun'], ['Fair', 'Tarif', 'Ücret', 'Pretium', 'Noun'],
-    ['Arrival', 'Arrivée', 'Varış', 'Adventus', 'Noun'], ['Departure', 'Départ', 'Kalkış', 'Profectio', 'Noun'], ['Wait', 'Attendre', 'Beklemek', 'Exspectare', 'Verb'],
-    ['Go', 'Aller', 'Gitmek', 'Ire', 'Verb'], ['Stop', 'Arrêter', 'Durmak', 'Sistere', 'Verb']
-  ]),
-  ...createLevel(10, [
-    ['Phone', 'Téléphone', 'Telefon', 'Telephonum', 'Noun'], ['Computer', 'Ordinateur', 'Bilgisayar', 'Ordinatrum', 'Noun'], ['Laptop', 'Portable', 'Dizüstü', 'Computatrum gestabile', 'Noun'],
-    ['Screen', 'Écran', 'Ekran', 'Abacus', 'Noun'], ['Keyboard', 'Clavier', 'Klavye', 'Plectrum', 'Noun'], ['Mouse', 'Souris', 'Fare', 'Mus', 'Noun'],
-    ['Battery', 'Batterie', 'Batarya', 'Accumulatrum', 'Noun'], ['Charger', 'Chargeur', 'Şarj aleti', 'Cargatorium', 'Noun'], ['Internet', 'Internet', 'İnternet', 'Internexus', 'Noun'],
-    ['Website', 'Site web', 'Web sitesi', 'Situs interretialis', 'Noun'], ['Email', 'E-mail', 'E-posta', 'Litterae electronicae', 'Noun'], ['Password', 'Mot de passe', 'Şifre', 'Tessera', 'Noun'],
-    ['App', 'Application', 'Uygulama', 'Programma', 'Noun'], ['Message', 'Message', 'Mesaj', 'Nuntius', 'Noun'], ['Camera', 'Appareil photo', 'Kamera', 'Machina photographica', 'Noun'],
-    ['Television', 'Télévision', 'Televizyon', 'Televisorium', 'Noun'], ['Radio', 'Radio', 'Radyo', 'Radiophonium', 'Noun'], ['Speaker', 'Haut-parleur', 'Hoparlör', 'Megaphonium', 'Noun'],
-    ['Headphones', 'Casque', 'Kulaklık', 'Auricularia', 'Noun'], ['Tablet', 'Tablette', 'Tablet', 'Tabula', 'Noun'], ['Printer', 'Imprimante', 'Yazıcı', 'Typographum', 'Noun'],
-    ['Monitor', 'Moniteur', 'Monitör', 'Monitorium', 'Noun'], ['Software', 'Logiciel', 'Yazılım', 'Programmarium', 'Noun'], ['Hardware', 'Matériel', 'Donanım', 'Instrumentarium', 'Noun'],
-    ['Memory', 'Mémoire', 'Hafıza', 'Memoria', 'Noun'], ['Cloud', 'Cloud', 'Bulut', 'Nubes digitalis', 'Noun'], ['Network', 'Réseau', 'Ağ', 'Rete', 'Noun'],
-    ['Signal', 'Signal', 'Sinyal', 'Signum', 'Noun'], ['Wifi', 'Wifi', 'Wifi', 'Wifium', 'Noun'], ['Bluetooth', 'Bluetooth', 'Bluetooth', 'Caeruleodens', 'Noun'],
-    ['Volume', 'Volume', 'Ses', 'Magnitudo soni', 'Noun'], ['Bright', 'Luminosité', 'Parlaklık', 'Splendor', 'Noun'], ['Display', 'Affichage', 'Görüntü', 'Ostentus', 'Noun'],
-    ['Settings', 'Paramètres', 'Ayarlar', 'Praeferentiae', 'Noun'], ['Update', 'Mise à jour', 'Güncelleme', 'Refectio', 'Noun'], ['Download', 'Téléchargement', 'İndirme', 'Depromptio', 'Noun'],
-    ['Upload', 'Chargement', 'Yükleme', 'Oneratio', 'Noun'], ['File', 'Fichier', 'Dosya', 'Scapus', 'Noun'], ['Folder', 'Dossier', 'Klasör', 'Theca', 'Noun'],
-    ['Icon', 'Icône', 'Simge', 'Icon', 'Noun'], ['Link', 'Lien', 'Bağlantı', 'Nexus', 'Noun'], ['User', 'Utilisateur', 'Kullanıcı', 'Usor', 'Noun'],
-    ['Account', 'Compte', 'Hesap', 'Ratio', 'Noun'], ['Login', 'Connexion', 'Giriş', 'Aditus', 'Noun'], ['Logout', 'Déconnexion', 'Çıkış', 'Discessus', 'Noun'],
-    ['Code', 'Code', 'Kod', 'Codex', 'Noun'], ['Error', 'Erreur', 'Hata', 'Error', 'Noun'], ['Fix', 'Réparer', 'Tamir', 'Refectio', 'Noun'],
-    ['Develop', 'Développer', 'Geliştirmek', 'Excolere', 'Verb'], ['Program', 'Programmer', 'Programlamak', 'Codificare', 'Verb']
-  ]),
-
-  // SEVİYE 11-12: SEBZE, MEYVE & YEMEK
-  ...createLevel(11, [
-    ['Apple', 'Pomme', 'Elma', 'Malum', 'Noun'], ['Banana', 'Banane', 'Muz', 'Ariena', 'Noun'], ['Orange', 'Orange', 'Portakal', 'Aurantium', 'Noun'],
-    ['Strawberry', 'Fraise', 'Çilek', 'Fragum', 'Noun'], ['Grape', 'Raisin', 'Üzüm', 'Uva', 'Noun'], ['Lemon', 'Citron', 'Limon', 'Citrium', 'Noun'],
-    ['Watermelon', 'Pastèque', 'Karpuz', 'Pepon', 'Noun'], ['Peach', 'Pêche', 'Şeftali', 'Persicum', 'Noun'], ['Cherry', 'Cerise', 'Kiraz', 'Cerasum', 'Noun'],
-    ['Melon', 'Melon', 'Kavun', 'Melo', 'Noun'], ['Pineapple', 'Ananas', 'Ananas', 'Ananas', 'Noun'], ['Mango', 'Mangue', 'Mango', 'Mangifera', 'Noun'],
-    ['Kiwi', 'Kiwi', 'Kivi', 'Kiwi', 'Noun'], ['Plum', 'Prune', 'Erik', 'Prunum', 'Noun'], ['Apricot', 'Abricot', 'Kayısı', 'Armeniacum', 'Noun'],
-    ['Pear', 'Poire', 'Armut', 'Pirum', 'Noun'], ['Pomegranate', 'Grenade', 'Nar', 'Granatum', 'Noun'], ['Fig', 'Figue', 'İncir', 'Ficus', 'Noun'],
-    ['Tomato', 'Tomate', 'Domates', 'Solanum', 'Noun'], ['Potato', 'Pomme de terre', 'Patates', 'Solanum tuberosum', 'Noun'], ['Carrot', 'Carotte', 'Havuç', 'Carota', 'Noun'],
-    ['Onion', 'Oignon', 'Soğan', 'Cepa', 'Noun'], ['Garlic', 'Ail', 'Sarımsak', 'Allium', 'Noun'], ['Cucumber', 'Concombre', 'Salatalık', 'Cucumis', 'Noun'],
-    ['Pepper', 'Poivre', 'Biber', 'Piper', 'Noun'], ['Corn', 'Maïs', 'Mısır', 'Frumentum', 'Noun'], ['Mushroom', 'Champignon', 'Mantar', 'Fungus', 'Noun'],
-    ['Lettuce', 'Laitue', 'Marul', 'Lactuca', 'Noun'], ['Olive', 'Olive', 'Zeytin', 'Oliva', 'Noun'], ['Spinach', 'Épinards', 'Ispanak', 'Spinacia', 'Noun'],
-    ['Broccoli', 'Brocoli', 'Brokoli', 'Brassica', 'Noun'], ['Cabbage', 'Chou', 'Lahana', 'Brassica capitata', 'Noun'], ['Peas', 'Petis pois', 'Bezelye', 'Pisum', 'Noun'],
-    ['Beans', 'Haricots', 'Fasulye', 'Phaseolus', 'Noun'], ['Eggplant', 'Aubergine', 'Patlıcan', 'Melongena', 'Noun'], ['Zucchini', 'Courgette', 'Kabak', 'Cucurbita', 'Noun'],
-    ['Radish', 'Radis', 'Turp', 'Raphanus', 'Noun'], ['Celery', 'Céleri', 'Kereviz', 'Apium', 'Noun'], ['Parsley', 'Persil', 'Maydanoz', 'Petroselinum', 'Noun'],
-    ['Basil', 'Basilic', 'Fesleğen', 'Basilicum', 'Noun'], ['Mint', 'Menthe', 'Nane', 'Mentha', 'Noun'], ['Ginger', 'Gingembre', 'Zencefil', 'Zingiber', 'Noun'],
-    ['Pumpkin', 'Citrouille', 'Kabak', 'Cucurbita maxima', 'Noun'], ['Cauliflower', 'Chou-fleur', 'Karnabahar', 'Brassica cauliflora', 'Noun'], ['Asparagus', 'Asperge', 'Kuşkonmaz', 'Asparagus', 'Noun'],
-    ['Artichoke', 'Artichaut', 'Enginar', 'Cinara', 'Noun'], ['Nut', 'Noix', 'Ceviz', 'Nux', 'Noun'], ['Almond', 'Amande', 'Badem', 'Amygdalum', 'Noun'],
-    ['Hazelnut', 'Noisette', 'Fındık', 'Corylus', 'Noun'], ['Peanut', 'Cacahuète', 'Yer fıstığı', 'Arachis', 'Noun']
-  ]),
-  ...createLevel(12, [
-    ['Meal', 'Repas', 'Öğün', 'Cena', 'Noun'], ['Breakfast', 'Petit déjeuner', 'Kahvaltı', 'Ientaculum', 'Noun'], ['Lunch', 'Déjeuner', 'Öğle yemeği', 'Prandium', 'Noun'],
-    ['Dinner', 'Dîner', 'Akşam yemeği', 'Cena', 'Noun'], ['Soup', 'Soupe', 'Çorba', 'Ius', 'Noun'], ['Salad', 'Salade', 'Salata', 'Acetaria', 'Noun'],
-    ['Rice', 'Riz', 'Pirinç', 'Oryza', 'Noun'], ['Pasta', 'Pâtes', 'Makarna', 'Pasta', 'Noun'], ['Pizza', 'Pizza', 'Pizza', 'Pizza', 'Noun'],
-    ['Burger', 'Burger', 'Burger', 'Burger', 'Noun'], ['Sandwich', 'Sandwich', 'Sandviç', 'Sandvicum', 'Noun'], ['Cake', 'Gâteau', 'Pasta', 'Libum', 'Noun'],
-    ['Cookie', 'Biscuit', 'Kurabiye', 'Crustulum', 'Noun'], ['Ice cream', 'Glace', 'Dondurma', 'Gelidum', 'Noun'], ['Chocolate', 'Chocolat', 'Çikolata', 'Socolata', 'Noun'],
-    ['Tea', 'Thé', 'Çay', 'Thea', 'Noun'], ['Coffee', 'Café', 'Kahve', 'Coffeum', 'Noun'], ['Honey', 'Miel', 'Bal', 'Mel', 'Noun'],
-    ['Butter', 'Beurre', 'Tereyağı', 'Butyrum', 'Noun'], ['Oil', 'Huile', 'Yağ', 'Oleum', 'Noun'], ['Yogurt', 'Yaourt', 'Yoğurt', 'Iogurtum', 'Noun'],
-    ['Cream', 'Crème', 'Krema', 'Flos lactis', 'Noun'], ['Jam', 'Confiture', 'Reçel', 'Conditura', 'Noun'], ['Egg', 'Œuf', 'Yumurta', 'Ovum', 'Noun'],
-    ['Meat', 'Viande', 'Et', 'Caro', 'Noun'], ['Steak', 'Steak', 'Biftek', 'Offa carnis', 'Noun'], ['Kebab', 'Kebab', 'Kebap', 'Carnis tosta', 'Noun'],
-    ['Fish', 'Poisson', 'Balık', 'Piscis', 'Noun'], ['Shrimp', 'Crevette', 'Karides', 'Squilla', 'Noun'], ['Sausage', 'Saucisse', 'Sosis', 'Botulus', 'Noun'],
-    ['Ham', 'Jambon', 'Jambon', 'Perna', 'Noun'], ['Bacon', 'Bacon', 'Pastırma', 'Lardum', 'Noun'], ['Cheese', 'Fromage', 'Peynir', 'Caseus', 'Noun'],
-    ['Bread', 'Pain', 'Ekmek', 'Panis', 'Noun'], ['Toast', 'Toast', 'Tost', 'Panis tostus', 'Noun'], ['Omelet', 'Omelette', 'Omlet', 'Omeletta', 'Noun'],
-    ['Soup', 'Soupe', 'Çorba', 'Ius', 'Noun'], ['Stew', 'Ragoût', 'Yahnı', 'Iusculum', 'Noun'], ['Sauce', 'Sauce', 'Sos', 'Salsamentum', 'Noun'],
-    ['Vinegar', 'Vinaigre', 'Sirke', 'Acetum', 'Noun'], ['Spices', 'Épices', 'Baharatlar', 'Condimenta', 'Noun'], ['Pepper', 'Poivre', 'Karabiber', 'Piper nigrum', 'Noun'],
-    ['Salt', 'Sel', 'Tuz', 'Sal', 'Noun'], ['Sugar', 'Sucre', 'Şeker', 'Saccharum', 'Noun'], ['Candy', 'Bonbon', 'Şekerleme', 'Cuppediae', 'Noun'],
-    ['Pie', 'Tarte', 'Turta', 'Crustum', 'Noun'], ['Pastry', 'Pâtisserie', 'Hamur işi', 'Pastillum', 'Noun'], ['Donut', 'Donut', 'Donut', 'Donut', 'Noun'],
-    ['Menu', 'Menu', 'Menü', 'Index ciborum', 'Noun'], ['Bill', 'Addition', 'Hesap', 'Ratio', 'Noun']
-  ]),
-
-  // SEVİYE 13-14: SANAT, MESLEK & AKSESUAR
-  ...createLevel(13, [
-    ['Painting', 'Peinture', 'Resim', 'Pictura', 'Noun'], ['Sculpture', 'Sculpture', 'Heykel', 'Sculptura', 'Noun'], ['Music', 'Musique', 'Müzik', 'Musica', 'Noun'],
-    ['Dance', 'Danse', 'Dans', 'Saltatio', 'Noun'], ['Theatre', 'Théâtre', 'Tiyatro', 'Theatrum', 'Noun'], ['Cinema', 'Cinéma', 'Sinema', 'Cinematographeum', 'Noun'],
-    ['Artist', 'Artiste', 'Sanatçı', 'Artifex', 'Noun'], ['Writer', 'Écrivain', 'Yazar', 'Scriptor', 'Noun'], ['Singer', 'Chanteur', 'Şarkıcı', 'Cantor', 'Noun'],
-    ['Actor', 'Aktör', 'Aktör', 'Actor', 'Noun'], ['Guitar', 'Guitare', 'Gitar', 'Cithara', 'Noun'], ['Piano', 'Piano', 'Piyano', 'Clavicymbalum', 'Noun'],
-    ['Violin', 'Violon', 'Keman', 'Violina', 'Noun'], ['Frame', 'Cadre', 'Çerçeve', 'Forma', 'Noun'], ['Color', 'Couleur', 'Renk', 'Color', 'Noun'],
-    ['Brush', 'Pinceau', 'Fırça', 'Penicillus', 'Noun'], ['Canvas', 'Toile', 'Tuval', 'Linteum', 'Noun'], ['Art', 'Art', 'Sanat', 'Ars', 'Noun'],
-    ['Drawing', 'Dessin', 'Çizim', 'Delineatio', 'Noun'], ['Design', 'Design', 'Tasarım', 'Designatio', 'Noun'], ['Poem', 'Poème', 'Şiir', 'Poema', 'Noun'],
-    ['Novel', 'Roman', 'Roman', 'Mythistoria', 'Noun'], ['Scene', 'Scène', 'Sahne', 'Scena', 'Noun'], ['Play', 'Pièce', 'Oyun', 'Fabula', 'Noun'],
-    ['Musical', 'Comédie musicale', 'Müzikal', 'Comoedia musica', 'Noun'], ['Band', 'Groupe', 'Grup', 'Grex musicus', 'Noun'], ['Stage', 'Scène', 'Sahne', 'Pulpitum', 'Noun'],
-    ['Audience', 'Public', 'Seyirci', 'Auditorium', 'Noun'], ['Performance', 'Performance', 'Performans', 'Exhibitio', 'Noun'], ['Creative', 'Créatif', 'Yaratıcı', 'Creativus', 'Adjective'],
-    ['Masterpiece', 'Chef-d\'œuvre', 'Başyapıt', 'Opus magnum', 'Noun'], ['Gallery', 'Galerie', 'Galeri', 'Pinacotheca', 'Noun'], ['Museum', 'Musée', 'Müze', 'Museum', 'Noun'],
-    ['Exhibit', 'Exposition', 'Sergi', 'Expositio', 'Noun'], ['Abstract', 'Abstrait', 'Soyut', 'Abstraktus', 'Adjective'], ['Modern', 'Moderne', 'Modern', 'Modernus', 'Adjective'],
-    ['Classic', 'Classique', 'Klasik', 'Classicus', 'Adjective'], ['Style', 'Style', 'Tarz', 'Stilus', 'Noun'], ['Pattern', 'Motif', 'Desen', 'Motivus', 'Noun'],
-    ['Sketch', 'Croquis', 'Taslak', 'Adumbratio', 'Noun'], ['Illustration', 'Illustration', 'İllüstrasyon', 'Illustratio', 'Noun'], ['Craft', 'Artisanat', 'Zanaat', 'Opificium', 'Noun'],
-    ['Photography', 'Photographie', 'Fotoğrafçılık', 'Photographia', 'Noun'], ['Camera', 'Caméra', 'Kamera', 'Machina photographica', 'Noun'], ['Director', 'Directeur', 'Yönetmen', 'Director', 'Noun'],
-    ['Producers', 'Producteurs', 'Yapımcılar', 'Curatores', 'Noun'], ['Culture', 'Culture', 'Kültür', 'Cultura', 'Noun'], ['Fashion', 'Mode', 'Moda', 'Habitus', 'Noun'],
-    ['Trend', 'Tendance', 'Trend', 'Fluxus', 'Noun'], ['Inspiration', 'Inspiration', 'İlham', 'Inspiratio', 'Noun']
-  ]),
-  ...createLevel(14, [
-    ['Doctor', 'Docteur', 'Doktor', 'Medicus', 'Noun'], ['Nurse', 'Infirmière', 'Hemşire', 'Nutrix', 'Noun'], ['Engineer', 'Ingénieur', 'Mühendis', 'Machinator', 'Noun'],
-    ['Lawyer', 'Avocat', 'Avukat', 'Advocatus', 'Noun'], ['Police', 'Police', 'Polis', 'Vigiles', 'Noun'], ['Firefighter', 'Pompier', 'İtfaiyeci', 'Siphonarius', 'Noun'],
-    ['Chef', 'Chef', 'Aşçı', 'Coquus', 'Noun'], ['Waiter', 'Serveur', 'Garson', 'Minister', 'Noun'], ['Worker', 'Ouvrier', 'İşçi', 'Operarius', 'Noun'],
-    ['Pilot', 'Pilote', 'Pilot', 'Gubernator', 'Noun'], ['Farmer', 'Fermier', 'Çiftçi', 'Agricola', 'Noun'], ['Scientist', 'Scientifique', 'Bilim insanı', 'Scientista', 'Noun'],
-    ['Dentist', 'Dentiste', 'Diş hekimi', 'Dentium medicus', 'Noun'], ['Driver', 'Chauffeur', 'Şoför', 'Rhedarius', 'Noun'], ['Manager', 'Manager', 'Yönetici', 'Administrator', 'Noun'],
-    ['Accountant', 'Comptable', 'Muhasebeci', 'Rationarius', 'Noun'], ['Baker', 'Boulanger', 'Fırıncı', 'Pistor', 'Noun'], ['Butcher', 'Boucher', 'Kasap', 'Lanius', 'Noun'],
-    ['Carpenter', 'Charpentier', 'Marangoz', 'Faber lignarius', 'Noun'], ['Electrician', 'Électricien', 'Elektrikçi', 'Electricus', 'Noun'], ['Plumber', 'Plombier', 'Tesisatçı', 'Plumbarius', 'Noun'],
-    ['Tailor', 'Tailleur', 'Terzi', 'Sartor', 'Noun'], ['Hairdresser', 'Coiffeur', 'Kuaför', 'Tonsor', 'Noun'], ['Guard', 'Garde', 'Bekçi', 'Custos', 'Noun'],
-    ['Judge', 'Juge', 'Hakim', 'Iudex', 'Noun'], ['Watch', 'Montre', 'Saat', 'Horologium gestabile', 'Noun'], ['Ring', 'Bague', 'Yüzük', 'Anulus', 'Noun'],
-    ['Necklace', 'Collier', 'Kolye', 'Monile', 'Noun'], ['Earrings', 'Boucles d\'oreilles', 'Küpeler', 'Inaures', 'Noun'], ['Bracelet', 'Bracelet', 'Bilezik', 'Armilla', 'Noun'],
-    ['Glasses', 'Lunettes', 'Gözlük', 'Perspicillum', 'Noun'], ['Hat', 'Chapeau', 'Şapka', 'Petasus', 'Noun'], ['Cap', 'Casquette', 'Kep', 'Pilleus', 'Noun'],
-    ['Belt', 'Ceinture', 'Kemer', 'Cingulum', 'Noun'], ['Wallet', 'Portefeuille', 'Cüzdan', 'Marsupium', 'Noun'], ['Purse', 'Sac à main', 'El çantası', 'Sacculus', 'Noun'],
-    ['Scarf', 'Écharpe', 'Atkı', 'Focale', 'Noun'], ['Gloves', 'Gants', 'Eldiven', 'Chirothecae', 'Noun'], ['Tie', 'Cravate', 'Kravat', 'Focale lineum', 'Noun'],
-    ['Umbrella', 'Parapluie', 'Şemsiye', 'Umbrella', 'Noun'], ['Jewelry', 'Bijoux', 'Mücevher', 'Gemmae', 'Noun'], ['Silver', 'Argent', 'Gümüş', 'Argentum', 'Noun'],
-    ['Gold', 'Or', 'Altın', 'Aurum', 'Noun'], ['Diamond', 'Diamant', 'Elmas', 'Adamas', 'Noun'], ['Suitcase', 'Valise', 'Valiz', 'Riscus', 'Noun'],
-    ['Bag', 'Sac', 'Çanta', 'Saccus', 'Noun'], ['Keyring', 'Porte-clés', 'Anahtarlık', 'Annulus clavium', 'Noun'], ['Button', 'Bouton', 'Düğme', 'Fibula', 'Noun'],
-    ['Pocket', 'Poche', 'Cep', 'Sacculus', 'Noun'], ['Zip', 'Fermeture éclair', 'Fermuar', 'Clausura', 'Noun']
-  ]),
-
-  // SEVİYE 15-16: VÜCUT, AİLE & DOĞA
-  ...createLevel(15, [
-    ['Head', 'Tête', 'Baş', 'Caput', 'Noun'], ['Eye', 'Œil', 'Göz', 'Oculus', 'Noun'], ['Ear', 'Oreille', 'Kulak', 'Auris', 'Noun'],
-    ['Nose', 'Nez', 'Burun', 'Nasus', 'Noun'], ['Mouth', 'Bouche', 'Ağız', 'Os', 'Noun'], ['Hair', 'Cheveux', 'Saç', 'Capillus', 'Noun'],
-    ['Neck', 'Cou', 'Boyun', 'Collum', 'Noun'], ['Shoulder', 'Épaule', 'Omuz', 'Humerus', 'Noun'], ['Arm', 'Bras', 'Kol', 'Bracchium', 'Noun'],
-    ['Hand', 'Main', 'El', 'Manus', 'Noun'], ['Finger', 'Doigt', 'Parmak', 'Digitus', 'Noun'], ['Leg', 'Jambe', 'Bacak', 'Crus', 'Noun'],
-    ['Foot', 'Pied', 'Ayak', 'Pes', 'Noun'], ['Knee', 'Genou', 'Diz', 'Genu', 'Noun'], ['Heart', 'Cœur', 'Kalp', 'Cor', 'Noun'],
-    ['Brain', 'Cerveau', 'Beyin', 'Cerebrum', 'Noun'], ['Blood', 'Sang', 'Kan', 'Sanguis', 'Noun'], ['Skin', 'Peau', 'Deri', 'Cutis', 'Noun'],
-    ['Face', 'Visage', 'Yüz', 'Facies', 'Noun'], ['Back', 'Dos', 'Sırt', 'Dorsum', 'Noun'], ['Body', 'Corps', 'Vücut', 'Corpus', 'Noun'],
-    ['Bone', 'Os', 'Kemik', 'Os', 'Noun'], ['Muscle', 'Muscle', 'Kas', 'Musculus', 'Noun'], ['Tooth', 'Dent', 'Diş', 'Dens', 'Noun'],
-    ['Tongue', 'Langue', 'Dil', 'Lingua', 'Noun'], ['Lip', 'Lèvre', 'Dudak', 'Labium', 'Noun'], ['Eyebrow', 'Sourcil', 'Kaş', 'Supercilium', 'Noun'],
-    ['Eyelash', 'Cil', 'Kirpik', 'Cilium', 'Noun'], ['Forehead', 'Front', 'Alın', 'Frons', 'Noun'], ['Chin', 'Menton', 'Çene', 'Mentum', 'Noun'],
-    ['Cheek', 'Joue', 'Yanak', 'Gena', 'Noun'], ['Throat', 'Gorge', 'Boğaz', 'Guttur', 'Noun'], ['Chest', 'Poitrine', 'Göğüs', 'Pectus', 'Noun'],
-    ['Stomach', 'Estomac', 'Mide', 'Stomachus', 'Noun'], ['Waist', 'Taille', 'Bel', 'Cingulum', 'Noun'], ['Hip', 'Hanche', 'Kalça', 'Coxa', 'Noun'],
-    ['Elbow', 'Coude', 'Dirsek', 'Cubitus', 'Noun'], ['Wrist', 'Poignet', 'Bilek', 'Carpus', 'Noun'], ['Thumb', 'Pouce', 'Baş parmak', 'Pollex', 'Noun'],
-    ['Nail', 'Ongle', 'Tırnak', 'Unguis', 'Noun'], ['Ankle', 'Cheville', 'Ayak bileği', 'Talus', 'Noun'], ['Heel', 'Talon', 'Topuk', 'Calx', 'Noun'],
-    ['Toe', 'Orteil', 'Ayak parmağı', 'Digitus pedis', 'Noun'], ['Lung', 'Poumon', 'Akciğer', 'Pulmo', 'Noun'], ['Liver', 'Foie', 'Karaciğer', 'Iecur', 'Noun'],
-    ['Kidney', 'Rein', 'Böbrek', 'Ren', 'Noun'], ['Skeleton', 'Squelette', 'İskelet', 'Sceleton', 'Noun'], ['Organ', 'Organe', 'Organ', 'Organum', 'Noun'],
-    ['Breath', 'Souffle', 'Nefes', 'Spiritus', 'Noun'], ['Pulse', 'Pouls', 'Nabız', 'Pulsus', 'Noun']
-  ]),
-  ...createLevel(16, [
-    ['Family', 'Famille', 'Aile', 'Familia', 'Noun'], ['Mother', 'Mère', 'Anne', 'Mater', 'Noun'], ['Father', 'Père', 'Baba', 'Pater', 'Noun'],
-    ['Sister', 'Sœur', 'Kız Kardeş', 'Soror', 'Noun'], ['Brother', 'Frère', 'Erkek Kardeş', 'Frater', 'Noun'], ['Baby', 'Bébé', 'Bebek', 'Infans', 'Noun'],
-    ['Child', 'Enfant', 'Çocuk', 'Puer', 'Noun'], ['Grandmother', 'Grand-mère', 'Büyükanne', 'Avia', 'Noun'], ['Grandfather', 'Grand-père', 'Büyükbaba', 'Avus', 'Noun'],
-    ['Aunt', 'Tante', 'Teyze/Hala', 'Amita', 'Noun'], ['Uncle', 'Oncle', 'Amca/Dayı', 'Patruus', 'Noun'], ['Cousin', 'Cousin', 'Kuzen', 'Consobrinus', 'Noun'],
-    ['Parents', 'Parents', 'Ebeveyn', 'Parentes', 'Noun'], ['Friend', 'Ami', 'Arkadaş', 'Amicus', 'Noun'], ['Nature', 'Nature', 'Doğa', 'Natura', 'Noun'],
-    ['Tree', 'Arbre', 'Ağaç', 'Arbor', 'Noun'], ['Flower', 'Fleur', 'Çiçek', 'Flos', 'Noun'], ['Grass', 'Herbe', 'Çim', 'Gramen', 'Noun'],
-    ['River', 'Rivière', 'Nehir', 'Flumen', 'Noun'], ['Mountain', 'Montagne', 'Dağ', 'Mons', 'Noun'], ['Sun', 'Soleil', 'Güneş', 'Sol', 'Noun'],
-    ['Moon', 'Lune', 'Ay', 'Luna', 'Noun'], ['Sky', 'Ciel', 'Gökyüzü', 'Caelum', 'Noun'], ['Cloud', 'Nuage', 'Bulut', 'Nubes', 'Noun'],
-    ['Rain', 'Pluie', 'Yağmur', 'Pluvia', 'Noun'], ['Snow', 'Neige', 'Kar', 'Nix', 'Noun'], ['Wind', 'Vent', 'Rüzgar', 'Ventus', 'Noun'],
-    ['Storm', 'Tempête', 'Fırtına', 'Tempestas', 'Noun'], ['Lightning', 'Éclair', 'Şimşek', 'Fulgur', 'Noun'], ['Bird', 'Oiseau', 'Kuş', 'Avis', 'Noun'],
-    ['Cat', 'Chat', 'Kedi', 'Felis', 'Noun'], ['Dog', 'Chien', 'Köpek', 'Canis', 'Noun'], ['Horse', 'Cheval', 'At', 'Equus', 'Noun'],
-    ['Cow', 'Vache', 'İnek', 'Vacca', 'Noun'], ['Sheep', 'Mouton', 'Koyun', 'Ovis', 'Noun'], ['Goat', 'Chèvre', 'Keçi', 'Capra', 'Noun'],
-    ['Rabbit', 'Lapin', 'Tavşan', 'Cuniculus', 'Noun'], ['Duck', 'Canard', 'Ördek', 'Anas', 'Noun'], ['Chicken', 'Poulet', 'Tavuk', 'Pullus', 'Noun'],
-    ['Leaf', 'Feuille', 'Yaprak', 'Folium', 'Noun'], ['Branch', 'Branche', 'Dal', 'Ramus', 'Noun'], ['Root', 'Racine', 'Kök', 'Radix', 'Noun'],
-    ['Seed', 'Graine', 'Tohum', 'Semen', 'Noun'], ['Fruit', 'Fruit', 'Meyve', 'Fructus', 'Noun'], ['Wood', 'Bois', 'Odun', 'Lignum', 'Noun'],
-    ['Dirt', 'Terre', 'Toprak', 'Humus', 'Noun'], ['Sand', 'Sable', 'Kum', 'Arena', 'Noun'], ['Stone', 'Pierre', 'Taş', 'Lapis', 'Noun'],
-    ['Lake', 'Lac', 'Göl', 'Lacus', 'Noun'], ['Hill', 'Colline', 'Tepe', 'Collis', 'Noun']
-  ]),
-
-  // SEVİYE 17-18: UZAY, OKYANUS & ORMAN
-  ...createLevel(17, [
-    ['Space', 'Espace', 'Uzay', 'Spatium', 'Noun'], ['Star', 'Étoile', 'Yıldız', 'Stella', 'Noun'], ['Planet', 'Planète', 'Gezegen', 'Planeta', 'Noun'],
-    ['Galaxy', 'Galaxie', 'Galaksi', 'Galaxias', 'Noun'], ['Universe', 'Univers', 'Evren', 'Universum', 'Noun'], ['Rocket', 'Fusée', 'Roket', 'Rochetum', 'Noun'],
-    ['Astronaut', 'Astronaute', 'Astronot', 'Astronauta', 'Noun'], ['Gravity', 'Gravité', 'Yerçekimi', 'Gravitas', 'Noun'], ['Orbit', 'Orbite', 'Yörünge', 'Orbis', 'Noun'],
-    ['Light', 'Lumière', 'Işık', 'Lux', 'Noun'], ['Void', 'Vide', 'Boşluk', 'Vacuum', 'Noun'], ['Atmosphere', 'Atmosphère', 'Atmosfer', 'Atmosphaera', 'Noun'],
-    ['Earth', 'Terre', 'Dünya', 'Terra', 'Noun'], ['Mars', 'Mars', 'Mars', 'Mars', 'Noun'], ['Jupiter', 'Jupiter', 'Jüpiter', 'Iuppiter', 'Noun'],
-    ['Saturn', 'Saturne', 'Satürn', 'Saturnus', 'Noun'], ['Venus', 'Vénus', 'Venüs', 'Venus', 'Noun'], ['Mercury', 'Mercure', 'Merkür', 'Mercurius', 'Noun'],
-    ['Uranus', 'Uranus', 'Uranüs', 'Uranus', 'Noun'], ['Neptune', 'Neptune', 'Neptün', 'Neptunus', 'Noun'], ['Sun', 'Soleil', 'Güneş', 'Sol', 'Noun'],
-    ['Moon', 'Lune', 'Ay', 'Luna', 'Noun'], ['Comet', 'Comète', 'Kuyruklu yıldız', 'Cometa', 'Noun'], ['Asteroid', 'Astéroïde', 'Asteroid', 'Asteroides', 'Noun'],
-    ['Meteor', 'Météore', 'Meteor', 'Meteorum', 'Noun'], ['Black hole', 'Trou noir', 'Kara delik', 'Barathrum nigrum', 'Noun'], ['Space station', 'Station spatiale', 'Uzay istasyonu', 'Statio spatialis', 'Noun'],
-    ['Satellite', 'Satellite', 'Uydu', 'Satelles', 'Noun'], ['Telescope', 'Télescope', 'Teleskop', 'Telescopium', 'Noun'], ['Alien', 'Extraterrestre', 'Uzaylı', 'Aliena', 'Noun'],
-    ['Discovery', 'Découverte', 'Keşif', 'Inventio', 'Noun'], ['Journey', 'Voyage', 'Yolculuk', 'Iter', 'Noun'], ['Mission', 'Mission', 'Görev', 'Missio', 'Noun'],
-    ['Spaceship', 'Vaisseau spatial', 'Uzay gemisi', 'Navis spatialis', 'Noun'], ['Solar system', 'Système solaire', 'Güneş sistemi', 'Systema solare', 'Noun'], ['Eclipse', 'Éclipse', 'Tutulma', 'Eclipsis', 'Noun'],
-    ['Constellation', 'Constellation', 'Takımyıldız', 'Constellatio', 'Noun'], ['Cosmos', 'Cosmos', 'Kozmos', 'Cosmos', 'Noun'], ['Supernova', 'Supernova', 'Süpernova', 'Supernova', 'Noun'],
-    ['Launch', 'Lancement', 'Fırlatma', 'Emissio', 'Noun'], ['Explorer', 'Explorateur', 'Kaşif', 'Explorator', 'Noun'], ['Infinity', 'Infini', 'Sonsuzluk', 'Infinitas', 'Noun'],
-    ['Future', 'Futur', 'Gelecek', 'Futurum', 'Noun'], ['Time', 'Temps', 'Zaman', 'Tempus', 'Noun'], ['Speed', 'Vitesse', 'Hız', 'Velocitas', 'Noun'],
-    ['Vast', 'Vaste', 'Geniş', 'Vastus', 'Adjective'], ['Cold', 'Froid', 'Soğuk', 'Frigidus', 'Adjective'], ['Dark', 'Sombre', 'Karanlık', 'Obscurus', 'Adjective'],
-    ['Bright', 'Lumineux', 'Parlak', 'Lucidus', 'Adjective'], ['Silent', 'Silencieux', 'Sessiz', 'Silens', 'Adjective']
-  ]),
-  ...createLevel(18, [
-    ['Ocean', 'Océan', 'Okyanus', 'Oceanus', 'Noun'], ['Sea', 'Mer', 'Deniz', 'Mare', 'Noun'], ['Wave', 'Vague', 'Dalga', 'Unda', 'Noun'],
-    ['Fish', 'Poisson', 'Balık', 'Piscis', 'Noun'], ['Shark', 'Requin', 'Köpekbalığı', 'Pistris', 'Noun'], ['Whale', 'Baleine', 'Balina', 'Balaena', 'Noun'],
-    ['Dolphin', 'Dauphin', 'Yunus', 'Delphinus', 'Noun'], ['Octopus', 'Poulpe', 'Ahtapot', 'Polypus', 'Noun'], ['Crab', 'Crabe', 'Yengeç', 'Cancer', 'Noun'],
-    ['Coral', 'Corail', 'Mercan', 'Corallium', 'Noun'], ['Shell', 'Coquille', 'Kabuk', 'Concha', 'Noun'], ['Beach', 'Plage', 'Plaj', 'Litus', 'Noun'],
-    ['Island', 'Île', 'Ada', 'Insula', 'Noun'], ['Ship', 'Navire', 'Gemi', 'Navis', 'Noun'], ['Boat', 'Bateau', 'Tekne', 'Linter', 'Noun'],
-    ['Water', 'Eau', 'Su', 'Aqua', 'Noun'], ['Deep', 'Profond', 'Derin', 'Profundus', 'Adjective'], ['Blue', 'Bleu', 'Mavi', 'Caeruleus', 'Adjective'],
-    ['Forest', 'Forêt', 'Orman', 'Silva', 'Noun'], ['Tree', 'Arbre', 'Ağaç', 'Arbor', 'Noun'], ['Leaf', 'Feuille', 'Yaprak', 'Folium', 'Noun'],
-    ['Root', 'Racine', 'Kök', 'Radix', 'Noun'], ['Flower', 'Fleur', 'Çiçek', 'Flos', 'Noun'], ['Animal', 'Animal', 'Hayvan', 'Animal', 'Noun'],
-    ['Bird', 'Oiseau', 'Kuş', 'Avis', 'Noun'], ['Bear', 'Ours', 'Ayı', 'Ursus', 'Noun'], ['Wolf', 'Loup', 'Kurt', 'Lupus', 'Noun'],
-    ['Deer', 'Cerf', 'Geyik', 'Cervus', 'Noun'], ['Fox', 'Renard', 'Tilki', 'Vulpes', 'Noun'], ['Squirrel', 'Écureuil', 'Sincap', 'Sciurus', 'Noun'],
-    ['Lion', 'Lion', 'Aslan', 'Leo', 'Noun'], ['Tiger', 'Tigre', 'Kaplan', 'Tigris', 'Noun'], ['Elephant', 'Éléphant', 'Fil', 'Elephantus', 'Noun'],
-    ['Monkey', 'Singe', 'Maymun', 'Simia', 'Noun'], ['Snake', 'Serpent', 'Yılan', 'Serpens', 'Noun'], ['Frog', 'Grenouille', 'Kurbağa', 'Rana', 'Noun'],
-    ['Insect', 'Insecte', 'Böcek', 'Insectum', 'Noun'], ['Butterfly', 'Papillon', 'Kelebek', 'Papilio', 'Noun'], ['Nature', 'Nature', 'Doğa', 'Natura', 'Noun'],
-    ['Green', 'Vert', 'Yeşil', 'Viridis', 'Adjective'], ['Wild', 'Sauvage', 'Vahşi', 'Ferus', 'Adjective'], ['Fresh', 'Frais', 'Taze', 'Recens', 'Adjective'],
-    ['Quiet', 'Calme', 'Sessiz', 'Quietulus', 'Adjective'], ['Peaceful', 'Paisible', 'Huzurlu', 'Placidus', 'Adjective'], ['Path', 'Chemin', 'Yol', 'Semita', 'Noun'],
-    ['Cave', 'Grotte', 'Mağara', 'Spelunca', 'Noun'], ['Waterfall', 'Cascade', 'Şelale', 'Cataracta', 'Noun'], ['Lake', 'Lac', 'Göl', 'Lacus', 'Noun'],
-    ['Earth', 'Terre', 'Toprak', 'Humus', 'Noun'], ['Sky', 'Ciel', 'Gökyüzü', 'Caelum', 'Noun']
-  ]),
-
-  // SEVİYE 19-20: SEYAHAT, ÜLKELER & DUYGULAR
-  ...createLevel(19, [
-    ['Travel', 'Voyage', 'Seyahat', 'Iter', 'Noun'], ['Trip', 'Voyage', 'Gezi', 'Peregrinatio', 'Noun'], ['Hotel', 'Hôtel', 'Otel', 'Devorsorium', 'Noun'],
-    ['Map', 'Carte', 'Harita', 'Charta', 'Noun'], ['Guide', 'Guide', 'Rehber', 'Dux', 'Noun'], ['World', 'Monde', 'Dünya', 'Mundus', 'Noun'],
-    ['Country', 'Pays', 'Ülke', 'Terra', 'Noun'], ['City', 'Ville', 'Şehir', 'Urbs', 'Noun'], ['Flag', 'Drapeau', 'Bayrak', 'Vexillum', 'Noun'],
-    ['Holiday', 'Vacances', 'Tatil', 'Feriae', 'Noun'], ['Culture', 'Culture', 'Kültür', 'Cultura', 'Noun'], ['History', 'Histoire', 'Tarih', 'Historia', 'Noun'],
-    ['Turkey', 'Turquie', 'Türkiye', 'Turcia', 'Noun'], ['England', 'Angleterre', 'İngiltere', 'Anglia', 'Noun'], ['France', 'France', 'Fransa', 'Gallia', 'Noun'],
-    ['Germany', 'Allemagne', 'Almanya', 'Germania', 'Noun'], ['Italy', 'Italie', 'İtalya', 'Italia', 'Noun'], ['Spain', 'Espagne', 'İspanya', 'Hispania', 'Noun'],
-    ['USA', 'États-Unis', 'ABD', 'Civitates Foederatae', 'Noun'], ['Japan', 'Japon', 'Japonya', 'Iaponia', 'Noun'], ['China', 'Chine', 'Çin', 'Sina', 'Noun'],
-    ['Capital', 'Capitale', 'Başkent', 'Caput', 'Noun'], ['Border', 'Frontière', 'Sınır', 'Fines', 'Noun'], ['Visit', 'Visiter', 'Ziyaret etmek', 'Visitare', 'Verb'],
-    ['Explore', 'Explorer', 'Keşfetmek', 'Explorare', 'Verb'], ['Tour', 'Tour', 'Tur', 'Circuitus', 'Noun'], ['Adventure', 'Aventure', 'Macera', 'Facinus', 'Noun'],
-    ['Stay', 'Rester', 'Kalmak', 'Manere', 'Verb'], ['Leave', 'Partir', 'Ayrılmak', 'Discedere', 'Verb'], ['Airport', 'Aéroport', 'Havalimanı', 'Aeroportus', 'Noun'],
-    ['Railway', 'Chemin de fer', 'Demiryolu', 'Ferrovia', 'Noun'], ['Road', 'Route', 'Yol', 'Via', 'Noun'], ['Mountain', 'Montagne', 'Dağ', 'Mons', 'Noun'],
-    ['Sea', 'Mer', 'Deniz', 'Mare', 'Noun'], ['Lake', 'Lac', 'Göl', 'Lacus', 'Noun'], ['Nature', 'Nature', 'Doğa', 'Natura', 'Noun'],
-    ['Museum', 'Musée', 'Müze', 'Museum', 'Noun'], ['Palace', 'Palais', 'Saray', 'Palatium', 'Noun'], ['Castle', 'Château', 'Kale', 'Castellum', 'Noun'],
-    ['Temple', 'Temple', 'Tapınak', 'Templum', 'Noun'], ['Food', 'Nourriture', 'Yemek', 'Cibus', 'Noun'], ['Language', 'Langue', 'Dil', 'Lingua', 'Noun'],
-    ['Souvenir', 'Souvenir', 'Hediyelik eşya', 'Pignus', 'Noun'], ['Camera', 'Appareil photo', 'Kamera', 'Machina', 'Noun'], ['Photo', 'Photo', 'Fotoğraf', 'Imago', 'Noun'],
-    ['Famous', 'Célèbre', 'Ünlü', 'Clarus', 'Adjective'], ['Local', 'Local', 'Yerel', 'Indigena', 'Adjective'], ['Foreign', 'Étranger', 'Yabancı', 'Externus', 'Adjective'],
-    ['Global', 'Global', 'Küresel', 'Globalis', 'Adjective'], ['Passport', 'Passeport', 'Pasaport', 'Diploma', 'Noun']
-  ]),
-  ...createLevel(20, [
-    ['Happy', 'Heureux', 'Mutlu', 'Felix', 'Adjective'], ['Sad', 'Triste', 'Üzgün', 'Tristis', 'Adjective'], ['Angry', 'Colère', 'Öfkeli', 'Iratus', 'Adjective'],
-    ['Fear', 'Peur', 'Korku', 'Timor', 'Noun'], ['Love', 'Amour', 'Aşk', 'Amor', 'Noun'], ['Peace', 'Paix', 'Barış', 'Pax', 'Noun'],
-    ['Joy', 'Joie', 'Sevinç', 'Gaudium', 'Noun'], ['Surprise', 'Surprise', 'Sürpriz', 'Inopinatum', 'Noun'], ['Brave', 'Brave', 'Cesur', 'Fortis', 'Adjective'],
-    ['Shy', 'Timide', 'Utangaç', 'Verecundus', 'Adjective'], ['Funny', 'Drôle', 'Komik', 'Facetus', 'Adjective'], ['Serious', 'Sérieux', 'Ciddi', 'Severus', 'Adjective'],
-    ['Smart', 'Intelligent', 'Zeki', 'Sapiens', 'Adjective'], ['Kind', 'Gentil', 'Nazik', 'Benignus', 'Adjective'], ['Hope', 'Espoir', 'Umut', 'Spes', 'Noun'],
-    ['Dream', 'Rêve', 'Rüya', 'Somnium', 'Noun'], ['Feeling', 'Sentiment', 'Duygu', 'Affectus', 'Noun'], ['Opinion', 'Opinion', 'Görüş', 'Sententia', 'Noun'],
-    ['Idea', 'Idée', 'Fikir', 'Idea', 'Noun'], ['Memory', 'Mémoire', 'Hafıza', 'Memoria', 'Noun'], ['Truth', 'Vérité', 'Gerçek', 'Veritas', 'Noun'],
-    ['Success', 'Succès', 'Başarı', 'Successus', 'Noun'], ['Goal', 'But', 'Hedef', 'Meta', 'Noun'], ['Choice', 'Choix', 'Seçim', 'Optio', 'Noun'],
-    ['Will', 'Volonté', 'İrade', 'Voluntas', 'Noun'], ['Care', 'Soin', 'Özen', 'Cura', 'Noun'], ['Help', 'Aide', 'Yardım', 'Auxilium', 'Noun'],
-    ['Trust', 'Confiance', 'Güven', 'Fiducia', 'Noun'], ['Hate', 'Haine', 'Nefret', 'Odium', 'Noun'], ['Bored', 'Ennuyé', 'Sıkılmış', 'Fessus', 'Adjective'],
-    ['Tired', 'Fatigué', 'Yorgun', 'Fessus', 'Adjective'], ['Excited', 'Excité', 'Heyecanlı', 'Excitatus', 'Adjective'], ['Proud', 'Fier', 'Gururlu', 'Superbus', 'Adjective'],
-    ['Calm', 'Calme', 'Sakin', 'Placidus', 'Adjective'], ['Strong', 'Fort', 'Güçlü', 'Validus', 'Adjective'], ['Weak', 'Faible', 'Zayıf', 'Debilis', 'Adjective'],
-    ['Busy', 'Occupé', 'Meşgul', 'Occupatus', 'Adjective'], ['Lazy', 'Paresseux', 'Tembel', 'Ignavus', 'Adjective'], ['Honest', 'Honnête', 'Dürüst', 'Probus', 'Adjective'],
-    ['Free', 'Libre', 'Özgür', 'Liber', 'Adjective'], ['Equal', 'Égal', 'Eşit', 'Aequalis', 'Adjective'], ['Safe', 'Sûr', 'Güvenli', 'Tutus', 'Adjective'],
-    ['Good', 'Bon', 'İyi', 'Bonus', 'Adjective'], ['Bad', 'Mauvais', 'Kötü', 'Malus', 'Adjective'], ['Best', 'Meilleur', 'En iyi', 'Optimus', 'Adjective'],
-    ['Worst', 'Pire', 'En kötü', 'Pessimus', 'Adjective'], ['Beautiful', 'Beau', 'Güzel', 'Pulcher', 'Adjective'], ['Ugly', 'Laid', 'Çirkin', 'Turpis', 'Adjective'],
-    ['Young', 'Jeune', 'Genç', 'Iuvenis', 'Adjective'], ['Old', 'Vieux', 'Yaşlı', 'Senex', 'Adjective']
-  ])
+  ...createLevelWords(1, [['One', 'Un', 'Bir', 'Noun'], ['Time', 'Temps', 'Zaman', 'Noun'], ['Day', 'Jour', 'Gün', 'Noun'], ['Night', 'Nuit', 'Gece', 'Noun'], ['Week', 'Semaine', 'Hafta', 'Noun']]),
+  ...createLevelWords(2, [['Book', 'Livre', 'Kitap', 'Noun'], ['Pen', 'Stylo', 'Kalem', 'Noun'], ['Apple', 'Pomme', 'Elma', 'Noun'], ['Child', 'Enfant', 'Çocuk', 'Noun'], ['Table', 'Table', 'Masa', 'Noun']])
 ];

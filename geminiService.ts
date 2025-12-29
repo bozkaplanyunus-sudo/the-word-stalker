@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Modality } from "@google/genai";
 
 let sharedAudioCtx: AudioContext | null = null;
@@ -46,8 +45,7 @@ function speakWithBrowser(text: string, languageName: string) {
   const langMap: Record<string, string> = {
     'English': 'en-US',
     'Français': 'fr-FR',
-    'Türkçe': 'tr-TR',
-    'Latina': 'la-LA'
+    'Türkçe': 'tr-TR'
   };
   
   utterance.lang = langMap[languageName] || 'en-US';
@@ -106,7 +104,7 @@ export async function getMoreWords(category: string, count: number = 20): Promis
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `Generate a JSON array of ${count} most common ${category}s. Each object must have fields 'en' (English), 'fr' (French), 'tr' (Turkish), and 'la' (Latin).`,
+      contents: `Generate a JSON array of ${count} most common ${category}s. Each object must have fields 'en' (English), 'fr' (French), and 'tr' (Turkish).`,
       config: {
           responseMimeType: "application/json"
       }

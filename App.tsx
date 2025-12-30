@@ -9,7 +9,7 @@ const App: React.FC = () => {
   const [state, setState] = useState<GameState>({
     score: 0,
     currentMapLevel: 1,
-    maxUnlockedLevel: 20, // Tasarım ve test için tüm seviyeler açıldı
+    maxUnlockedLevel: 20,
     currentLanguage: 'tr',
     targetLanguage: 'en',
     gameMode: 'vocabulary',
@@ -36,15 +36,35 @@ const App: React.FC = () => {
     return translations[key] || key;
   };
 
+  // Harita noktalarını daha yakın ve yukarıda olacak şekilde güncelle
   const mapPathPoints = useMemo(() => {
     const points = [];
     for (let i = 0; i < 20; i++) {
       points.push({
-        x: 150 + i * 220, 
-        y: 400 + Math.sin(i * 1.5) * 80 
+        x: 100 + i * 160, // 220'den 160'a düşürüldü (daha yakın)
+        y: 320 + Math.sin(i * 1.5) * 50 // 400'den 320'ye (daha yukarıda)
       });
     }
     return points;
+  }, []);
+
+  // Rastgele yıldız ve nebula verilerini oluştur
+  const spaceBackground = useMemo(() => {
+    const stars = Array.from({ length: 150 }).map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      size: Math.random() * 2 + 1,
+      duration: `${2 + Math.random() * 4}s`,
+      delay: `${Math.random() * 5}s`
+    }));
+    const nebulas = [
+      { color: 'rgba(99, 102, 241, 0.15)', left: '10%', top: '20%', size: '40vw' },
+      { color: 'rgba(168, 85, 247, 0.15)', left: '50%', top: '40%', size: '35vw' },
+      { color: 'rgba(236, 72, 153, 0.1)', left: '80%', top: '10%', size: '30vw' },
+      { color: 'rgba(14, 165, 233, 0.1)', left: '30%', top: '70%', size: '45vw' },
+    ];
+    return { stars, nebulas };
   }, []);
 
   useEffect(() => {
@@ -90,19 +110,14 @@ const App: React.FC = () => {
           seenItemIds: [...prev.seenItemIds, randomWord.id]
         };
       } else {
-        // HATA DÜZELTME: Sadece mevcut seviyenin sorularını filtrele
         const levelEx = GRAMMAR_DATABASE.filter(g => g.level === prev.currentMapLevel && g.language === prev.targetLanguage);
         const availableEx = levelEx.filter(g => !prev.seenItemIds.includes(g.id));
         
-        // Eğer bu seviye için hiç soru yoksa haritaya dön
         if (levelEx.length === 0) {
-          console.warn("No grammar exercises found for this specific level/language.");
           return { ...baseUpdate, gameStatus: 'map' };
         }
 
-        // Eğer yeni soru kalmadıysa mevcut seviye havuzundan rastgele seç (tüm havuzdan değil!)
         const exPool = availableEx.length > 0 ? availableEx : levelEx;
-
         const randomEx = exPool[Math.floor(Math.random() * exPool.length)];
         
         return {
@@ -214,10 +229,10 @@ const App: React.FC = () => {
 
     if (!isVocab && exercise?.type === 'ordering') {
       const isSelected = state.orderingState?.includes(option);
-      const isLargeSet = state.options.length > 10;
+      const isLargeSet = state.options.length > 8;
       
-      const baseSize = isLargeSet ? "p-2 text-lg sm:p-3 sm:text-xl" : "p-4 text-2xl";
-      const base = `${baseSize} rounded-xl font-black transition-all border-2 flex items-center justify-center transform active:scale-90 `;
+      const baseSize = isLargeSet ? "px-2 py-3 text-sm sm:text-base" : "px-3 py-4 text-lg sm:text-xl";
+      const base = `${baseSize} rounded-xl font-black transition-all border-2 flex items-center justify-center transform active:scale-90 break-words text-center leading-tight `;
       
       if (state.selectedOption !== null) {
         const correctOrder = exercise.correctAnswer;
@@ -261,7 +276,6 @@ const App: React.FC = () => {
             <h1 className="text-4xl font-extrabold text-indigo-400 mb-2 font-['Nunito']">{t('welcome')}</h1>
             <p className="text-slate-400">{t('subWelcome')}</p>
           </div>
-
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">{t('sourceLabel')}</label>
@@ -278,7 +292,6 @@ const App: React.FC = () => {
                 ))}
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">{t('targetLabel')}</label>
               <div className="grid grid-cols-3 gap-2">
@@ -294,7 +307,6 @@ const App: React.FC = () => {
                 ))}
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">{t('modeLabel')}</label>
               <div className="flex gap-2">
@@ -313,7 +325,6 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-
           <button
             onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))}
             className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg shadow-lg shadow-indigo-500/30 transition-all active:scale-95"
@@ -327,32 +338,69 @@ const App: React.FC = () => {
 
   if (state.gameStatus === 'map') {
     return (
-      <div className="h-screen bg-[#050B1A] relative overflow-hidden">
+      <div className="h-screen bg-[#020617] relative overflow-hidden">
+        {/* Deep Space Background Layer */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          {/* Nebulas */}
+          {spaceBackground.nebulas.map((n, i) => (
+            <div 
+              key={i}
+              className="absolute rounded-full blur-[80px] opacity-40"
+              style={{
+                backgroundColor: n.color,
+                left: n.left,
+                top: n.top,
+                width: n.size,
+                height: n.size,
+              }}
+            />
+          ))}
+          {/* Twinkling Stars */}
+          {spaceBackground.stars.map(star => (
+            <div 
+              key={star.id}
+              className="star star-twinkle"
+              style={{
+                left: star.left,
+                top: star.top,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                // @ts-ignore
+                '--duration': star.duration,
+                animationDelay: star.delay
+              }}
+            />
+          ))}
+          {/* Shooting Stars */}
+          <div className="shooting-star" style={{ top: '10%', right: '5%', animation: 'shooting-star 8s infinite 2s' }} />
+          <div className="shooting-star" style={{ top: '40%', right: '15%', animation: 'shooting-star 12s infinite 5s' }} />
+        </div>
+
         <div className="absolute top-6 left-6 z-20 flex gap-4">
            <button 
             onClick={() => setState(p => ({ ...p, gameStatus: 'setup' }))}
-            className="px-4 py-2 bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl text-slate-400 hover:text-white transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-slate-800/80 backdrop-blur-md border border-slate-700 rounded-xl text-slate-400 hover:text-white transition-colors flex items-center gap-2"
           >
             ← {t('backToHome')}
           </button>
-          <div className="px-4 py-2 bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-indigo-400 font-bold flex items-center gap-2">
+          <div className="px-4 py-2 bg-indigo-600/30 backdrop-blur-md border border-indigo-500/40 rounded-xl text-indigo-300 font-bold flex items-center gap-2">
             🏆 {state.score}
           </div>
         </div>
 
         <div 
           ref={scrollContainerRef}
-          className="h-full overflow-x-auto overflow-y-hidden no-scrollbar cursor-grab active:cursor-grabbing"
+          className="h-full overflow-x-auto overflow-y-hidden no-scrollbar cursor-grab active:cursor-grabbing relative z-10"
         >
-          <div className="h-full relative" style={{ width: 20 * 220 + 400 }}>
+          <div className="h-full relative" style={{ width: 20 * 160 + 400 }}>
             <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
               <path 
                 d={`M ${mapPathPoints.map(p => `${p.x},${p.y}`).join(' L ')}`}
                 fill="none" 
                 stroke="white" 
-                strokeWidth="2" 
-                strokeDasharray="8 8" 
-                opacity="0.1" 
+                strokeWidth="1.5" 
+                strokeDasharray="4 6" 
+                opacity="0.15" 
               />
             </svg>
 
@@ -360,7 +408,8 @@ const App: React.FC = () => {
               const level = i + 1;
               const isUnlocked = level <= state.maxUnlockedLevel;
               const colors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6', '#10b981', '#22c55e', '#84cc16', '#eab308', '#f59e0b', '#f97316'];
-              const levelTitle = LEVEL_INFO[state.targetLanguage]?.[level]?.title || t('level') + " " + level;
+              const levelTitleData = LEVEL_INFO[state.targetLanguage]?.[level]?.title;
+              const levelTitle = levelTitleData ? levelTitleData[state.currentLanguage] : t('level') + " " + level;
 
               return (
                 <div 
@@ -370,16 +419,16 @@ const App: React.FC = () => {
                   onClick={() => isUnlocked && selectLevel(level)}
                 >
                   <div className="relative group">
-                    <svg width="160" height="160" viewBox="-80 -80 160 160">
+                    <svg width="140" height="140" viewBox="-80 -80 160 160">
                       <Planet 
                         level={level} 
                         color={colors[i % colors.length]} 
-                        size={35 + (i % 3) * 10} 
+                        size={30 + (i % 3) * 8} 
                         isUnlocked={isUnlocked} 
                       />
                     </svg>
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 text-center w-[200px]">
-                      <span className={`text-sm font-black uppercase tracking-widest drop-shadow-md ${isUnlocked ? 'text-white' : 'text-slate-600'}`}>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-center w-[160px]">
+                      <span className={`text-[11px] font-black uppercase tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${isUnlocked ? 'text-white' : 'text-slate-600'}`}>
                         {levelTitle}
                       </span>
                     </div>
@@ -393,54 +442,51 @@ const App: React.FC = () => {
     );
   }
 
+  // Seviye bilgilendirme sayfası
   if (state.gameStatus === 'explanation') {
     const topic = LEVEL_INFO[state.targetLanguage]?.[state.currentMapLevel];
+    const nativeTitle = topic?.title[state.currentLanguage] || topic?.title['en'] || t('level') + " " + state.currentMapLevel;
+    const nativeExplanation = topic?.explanation[state.currentLanguage] || topic?.explanation['en'];
+    const isDense = (topic?.examples?.length || 0) > 6;
+
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-white overflow-y-auto no-scrollbar">
-        <div className="max-w-xl w-full bg-slate-900 border border-slate-800 p-8 rounded-[2rem] shadow-2xl question-entrance my-8">
+        <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 p-8 rounded-[2rem] shadow-2xl question-entrance my-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 bg-indigo-600/20 rounded-xl flex items-center justify-center text-2xl shadow-inner">📖</div>
             <div>
               <p className="text-indigo-400 font-bold uppercase tracking-widest text-[10px]">{t('lessonTitle')}</p>
-              <h1 className="text-2xl font-black leading-tight">{topic?.title || t('level') + " " + state.currentMapLevel}</h1>
+              <h1 className="text-2xl font-black leading-tight no-uppercase">{nativeTitle}</h1>
             </div>
           </div>
-
-          <div className="space-y-4">
-            {topic?.explanation && (
+          <div className="space-y-6">
+            {nativeExplanation && (
               <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-                <p className="text-slate-300 leading-snug text-sm no-uppercase">
-                  {topic.explanation}
-                </p>
+                <p className="text-slate-300 leading-snug text-sm no-uppercase">{nativeExplanation}</p>
               </div>
             )}
-
             {topic?.examples && topic.examples.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Details</p>
-                <div className={`grid gap-2 ${topic.examples.length > 6 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1'}`}>
+              <div className="space-y-3">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Details</p>
+                <div className={`grid gap-2 overflow-y-auto max-h-[40vh] pr-2 no-scrollbar ${isDense ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1'}`}>
                   {topic.examples.map((ex, i) => (
-                    <div key={i} className="flex flex-col p-3 bg-slate-800/30 rounded-lg border border-slate-700/30 transition-colors hover:bg-slate-800/50">
-                      <span className="font-bold text-indigo-100 text-sm no-uppercase">{ex.original}</span>
-                      <span className="text-slate-500 text-xs italic no-uppercase">{ex.translated}</span>
+                    <div key={i} className="flex flex-col items-center justify-center p-3 bg-slate-800/30 rounded-xl border border-slate-700/30 transition-colors hover:bg-slate-800/50 text-center">
+                      <span className="font-black text-indigo-400 text-lg sm:text-xl no-uppercase leading-tight">
+                        {ex.label[state.currentLanguage] || ex.label['en']}
+                      </span>
+                      <div className="w-4 h-0.5 bg-slate-700 my-1 rounded-full" />
+                      <span className="text-slate-200 text-xs font-bold no-uppercase">{ex.content}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
           </div>
-
           <div className="mt-8 flex flex-col gap-3">
-            <button
-              onClick={startActualPlay}
-              className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg shadow-xl shadow-indigo-500/10 transition-all active:scale-95"
-            >
+            <button onClick={startActualPlay} className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg shadow-xl shadow-indigo-500/10 transition-all active:scale-95">
               🚀 {t('startLesson')}
             </button>
-            <button
-              onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))}
-              className="w-full py-2 text-slate-500 font-bold text-xs hover:text-white transition-colors"
-            >
+            <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="w-full py-2 text-slate-500 font-bold text-xs hover:text-white transition-colors">
               {t('backToMap')}
             </button>
           </div>
@@ -449,6 +495,7 @@ const App: React.FC = () => {
     );
   }
 
+  // Oyun alanı
   if (state.gameStatus === 'playing') {
     const isVocab = state.gameMode === 'vocabulary';
     const exercise = state.currentExercise;
@@ -459,15 +506,11 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-slate-950 flex flex-col text-white p-6 relative overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none" />
-
         <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col pb-24">
           <div className="flex justify-between items-center mb-12">
             <div className="flex-1 pr-8">
               <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-indigo-500 transition-all duration-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]"
-                  style={{ width: `${progress}%` }}
-                />
+                <div className="h-full bg-indigo-500 transition-all duration-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]" style={{ width: `${progress}%` }} />
               </div>
             </div>
             <div className="text-right">
@@ -475,7 +518,6 @@ const App: React.FC = () => {
               <p className="text-xl font-black text-indigo-400">{state.score}</p>
             </div>
           </div>
-
           <div key={uniqueQuestionKey} className="flex-1 flex flex-col items-center justify-center -mt-10 space-y-8 question-entrance">
             <div className="text-center w-full">
               {isVocab && state.currentWord ? (
@@ -492,7 +534,6 @@ const App: React.FC = () => {
                    <span className="px-4 py-1.5 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full uppercase tracking-tighter border border-blue-500/30">
                     {exercise.topic}
                   </span>
-                  
                   {exercise.type === 'choice' ? (
                     <h2 className="text-4xl font-bold no-uppercase text-slate-100 leading-snug">
                       {exercise.sentence.split('______').map((part, i, arr) => (
@@ -511,26 +552,22 @@ const App: React.FC = () => {
                       <h2 className="text-2xl font-bold text-slate-400 uppercase tracking-widest">{t('orderingInstruction')}</h2>
                       <div className="flex flex-wrap justify-center gap-1.5 min-h-[60px] p-4 bg-slate-900/60 border-2 border-dashed border-slate-700 rounded-3xl overflow-y-auto max-h-[160px] no-scrollbar">
                         {(state.orderingState || []).map((char, i) => (
-                          <div key={i} className={`px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 rounded-xl font-black animate-bounce ${exercise.options.length > 10 ? 'text-lg' : 'text-2xl'}`}>
+                          <div key={i} className={`px-2 py-1.5 sm:px-3 sm:py-2 bg-indigo-600 rounded-xl font-black animate-bounce leading-tight text-center ${exercise.options.length > 8 ? 'text-sm sm:text-base' : 'text-base sm:text-lg'}`}>
                             {char}
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
-                  
                   <div className="mt-4 p-3 bg-slate-900/40 border border-slate-800 rounded-2xl">
-                    <p className="text-slate-400 italic text-md no-uppercase max-w-md mx-auto">
-                      {exercise.translations[state.currentLanguage]}
-                    </p>
+                    <p className="text-slate-400 italic text-md no-uppercase max-w-md mx-auto">{exercise.translations[state.currentLanguage]}</p>
                   </div>
                 </div>
               )}
             </div>
-
             {exercise?.type === 'ordering' ? (
               <div className="w-full space-y-4">
-                <div className={`grid gap-2 w-full ${exercise.options.length > 15 ? 'grid-cols-6 sm:grid-cols-8' : 'grid-cols-4 sm:grid-cols-5'}`}>
+                <div className={`grid gap-2 w-full ${exercise.options.length > 10 ? 'grid-cols-4 sm:grid-cols-6' : 'grid-cols-3 sm:grid-cols-5'}`}>
                   {state.options.map((option, idx) => (
                     <button
                       key={`${uniqueQuestionKey}-opt-${idx}`}
@@ -542,23 +579,14 @@ const App: React.FC = () => {
                     </button>
                   ))}
                 </div>
-                <button 
-                  onClick={() => setState(p => ({ ...p, orderingState: [] }))}
-                  disabled={state.selectedOption !== null}
-                  className="w-full py-2 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-white transition-colors bg-slate-800/30 rounded-lg border border-slate-700/50"
-                >
+                <button onClick={() => setState(p => ({ ...p, orderingState: [] }))} disabled={state.selectedOption !== null} className="w-full py-2 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-white transition-colors bg-slate-800/30 rounded-lg border border-slate-700/50">
                   ↺ {t('clear')}
                 </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 w-full">
                 {state.options.map((option, idx) => (
-                  <button
-                    key={`${uniqueQuestionKey}-opt-${idx}`}
-                    onClick={() => handleAnswer(option)}
-                    disabled={state.selectedOption !== null}
-                    className={getOptionClasses(option)}
-                  >
+                  <button key={`${uniqueQuestionKey}-opt-${idx}`} onClick={() => handleAnswer(option)} disabled={state.selectedOption !== null} className={getOptionClasses(option)}>
                     <span className="no-uppercase">{option}</span>
                   </button>
                 ))}
@@ -566,12 +594,8 @@ const App: React.FC = () => {
             )}
           </div>
         </div>
-
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30">
-          <button 
-            onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))}
-            className="px-6 py-3 bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-2xl text-slate-400 hover:text-white transition-all flex items-center gap-2 shadow-2xl active:scale-95"
-          >
+          <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="px-6 py-3 bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-2xl text-slate-400 hover:text-white transition-all flex items-center gap-2 shadow-2xl active:scale-95">
             🗺️ {t('backToMap')}
           </button>
         </div>
@@ -579,6 +603,7 @@ const App: React.FC = () => {
     );
   }
 
+  // Sonuç ekranları
   if (state.gameStatus === 'level-up' || state.gameStatus === 'level-failed') {
     const win = state.gameStatus === 'level-up';
     return (
@@ -589,7 +614,6 @@ const App: React.FC = () => {
             <h1 className="text-4xl font-black mb-2">{win ? t('promoted') : t('failed')}</h1>
             <p className="text-slate-400">{win ? t('levelClear') : t('failedSub')}</p>
           </div>
-          
           <div className="flex justify-center gap-8 py-4 bg-slate-900/50 rounded-3xl border border-slate-800">
             <div>
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Accurate</p>
@@ -601,34 +625,19 @@ const App: React.FC = () => {
               <p className="text-2xl font-black text-indigo-400">+{state.correctAnswersInLevel * 10}</p>
             </div>
           </div>
-
           <div className="flex flex-col gap-3">
             {win ? (
-              <button
-                onClick={() => {
-                  setState(p => ({
-                    ...p,
-                    gameStatus: 'map',
-                    maxUnlockedLevel: Math.max(p.maxUnlockedLevel, p.currentMapLevel + 1),
-                    currentMapLevel: p.currentMapLevel + 1
-                  }));
-                }}
-                className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-500/20 transition-all active:scale-95"
-              >
+              <button onClick={() => {
+                setState(p => ({ ...p, gameStatus: 'map', maxUnlockedLevel: Math.max(p.maxUnlockedLevel, p.currentMapLevel + 1), currentMapLevel: p.currentMapLevel + 1 }));
+              }} className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-500/20 transition-all active:scale-95">
                 {t('nextSector')}
               </button>
             ) : (
-              <button
-                onClick={() => selectLevel(state.currentMapLevel)}
-                className="w-full py-5 bg-rose-600 hover:bg-rose-500 rounded-2xl font-bold text-lg shadow-xl shadow-rose-500/20 transition-all active:scale-95"
-              >
+              <button onClick={() => selectLevel(state.currentMapLevel)} className="w-full py-5 bg-rose-600 hover:bg-rose-500 rounded-2xl font-bold text-lg shadow-xl shadow-rose-500/20 transition-all active:scale-95">
                 {t('retry')}
               </button>
             )}
-            <button
-              onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))}
-              className="w-full py-4 bg-slate-800 hover:bg-slate-700 rounded-2xl font-bold text-slate-400 transition-all"
-            >
+            <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="w-full py-4 bg-slate-800 hover:bg-slate-700 rounded-2xl font-bold text-slate-400 transition-all">
               {t('backToMap')}
             </button>
           </div>

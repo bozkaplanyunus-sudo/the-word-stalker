@@ -18,9 +18,9 @@ export interface GrammarExercise {
 }
 
 export interface LevelInfo {
-  title: string;
-  explanation: string;
-  examples: { original: string; translated: string }[];
+  title: Record<string, string>; // Çok dilli başlık
+  explanation: Record<string, string>; // Çok dilli açıklama
+  examples: { label: Record<string, string>; content: string }[];
 }
 
 export interface Word {

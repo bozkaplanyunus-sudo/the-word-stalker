@@ -99,69 +99,130 @@ export const UI_TRANSLATIONS: Record<Language, Record<string, string>> = {
   }
 };
 
+const createNumExample = (n: number, word: string) => ({
+  label: { tr: n.toString(), en: n.toString(), fr: n.toString() },
+  content: word
+});
+
 // Grammar Level Info
 export const LEVEL_INFO: Record<Language, Record<number, LevelInfo>> = {
   tr: {
     1: {
-      title: "Alfabe",
-      explanation: "Türkçe’de 29 harf bulunmaktadır. Bunlardan 8 tanesi sesli, 21 tanesi sessizdir.",
+      title: { tr: "Alfabe", en: "Alphabet", fr: "L'Alphabet" },
+      explanation: { 
+        tr: "Türkçe’de 29 harf bulunmaktadır. Bunlardan 8 tanesi sesli, 21 tanesi sessizdir.",
+        en: "There are 29 letters in the Turkish alphabet. 8 are vowels and 21 are consonants.",
+        fr: "L'alphabet turc comprend 29 lettres. 8 sont des voyelles et 21 sont des consonnes."
+      },
       examples: [
-        { original: "Sesli Harfler", translated: "a, e, ı, i, o, ö, u, ü" },
-        { original: "Sessiz Harfler", translated: "b, c, ç, d, f, g, ğ, h, j, k, l, m, n, p, r, s, ş, t, v, y, z" }
+        { 
+          label: { tr: "Sesli Harfler", en: "Vowels", fr: "Voyelles" }, 
+          content: "a, e, ı, i, o, ö, u, ü" 
+        },
+        { 
+          label: { tr: "Sessiz Harfler", en: "Consonants", fr: "Consonnes" }, 
+          content: "b, c, ç, d, f, g, ğ, h, j, k, l, m, n, p, r, s, ş, t, v, y, z" 
+        }
       ]
     },
     2: {
-      title: "Sayılar",
-      explanation: "",
+      title: { tr: "Sayılar", en: "Numbers", fr: "Les Nombres" },
+      explanation: {
+        tr: "Türkçe sayılar onluk sisteme dayanır. Bir'den yirmi'ye kadar olan temel sayıları ve onluk ritmik saymayı öğreniyoruz.",
+        en: "Turkish numbers are based on the decimal system. We are learning basic numbers from one to twenty and counting by tens.",
+        fr: "Les nombres turcs sont basés sur le système décimal. Nous apprenons les nombres de base de un à vingt et le comptage par dizaines."
+      },
       examples: [
-        { original: "1", translated: "Bir" }, { original: "2", translated: "İki" },
-        { original: "3", translated: "Üç" }, { original: "4", translated: "Dört" },
-        { original: "5", translated: "Beş" }, { original: "6", translated: "Altı" },
-        { original: "7", translated: "Yedi" }, { original: "8", translated: "Sekiz" },
-        { original: "9", translated: "Dokuz" }, { original: "10", translated: "On" },
-        { original: "11", translated: "On Bir" }, { original: "12", translated: "On İki" },
-        { original: "13", translated: "On Üç" }, { original: "14", translated: "On Dört" },
-        { original: "15", translated: "On Beş" }, { original: "16", translated: "On Altı" },
-        { original: "17", translated: "On Yedi" }, { original: "18", translated: "On Sekiz" },
-        { original: "19", translated: "On Dokuz" }, { original: "20", translated: "Yirmi" },
-        { original: "30", translated: "Otuz" }, { original: "40", translated: "Kırk" },
-        { original: "50", translated: "Elli" }, { original: "60", translated: "Altmış" },
-        { original: "70", translated: "Yetmiş" }, { original: "80", translated: "Seksen" },
-        { original: "90", translated: "Doksan" }, { original: "100", translated: "Yüz" }
+        createNumExample(1, "Bir"), createNumExample(2, "İki"), createNumExample(3, "Üç"),
+        createNumExample(4, "Dört"), createNumExample(5, "Beş"), createNumExample(6, "Altı"),
+        createNumExample(7, "Yedi"), createNumExample(8, "Sekiz"), createNumExample(9, "Dokuz"),
+        createNumExample(10, "On"), createNumExample(11, "On Bir"), createNumExample(12, "On İki"),
+        createNumExample(13, "On Üç"), createNumExample(14, "On Dört"), createNumExample(15, "On Beş"),
+        createNumExample(16, "On Altı"), createNumExample(17, "On Yedi"), createNumExample(18, "On Sekiz"),
+        createNumExample(19, "On Dokuz"), createNumExample(20, "Yirmi"),
+        createNumExample(30, "Otuz"), createNumExample(40, "Kırk"), createNumExample(50, "Elli"),
+        createNumExample(60, "Altmış"), createNumExample(70, "Yetmiş"), createNumExample(80, "Seksen"),
+        createNumExample(90, "Doksan"), createNumExample(100, "Yüz")
       ]
     }
   },
   en: {
     1: {
-      title: "Alphabet",
-      explanation: "English alphabet consists of 26 letters.",
+      title: { tr: "Alfabe", en: "Alphabet", fr: "L'Alphabet" },
+      explanation: {
+        tr: "İngiliz alfabesi 26 harften oluşur: 5 sesli ve 21 sessiz harf.",
+        en: "The English alphabet consists of 26 letters: 5 vowels and 21 consonants.",
+        fr: "L'alphabet anglais se compose de 26 lettres : 5 voyelles et 21 consonnes."
+      },
       examples: [
-        { original: "Vowels", translated: "a, e, i, o, u" },
-        { original: "Consonants", translated: "b, c, d, f, g, ..." }
+        { 
+          label: { tr: "Sesli Harfler", en: "Vowels", fr: "Voyelles" }, 
+          content: "a, e, i, o, u" 
+        },
+        { 
+          label: { tr: "Sessiz Harfler", en: "Consonants", fr: "Consonnes" }, 
+          content: "b, c, d, f, g, ..." 
+        }
       ]
     },
     2: {
-      title: "Numbers",
-      explanation: "Let's learn counting from 1 to 10.",
+      title: { tr: "Sayılar", en: "Numbers", fr: "Les Nombres" },
+      explanation: {
+        tr: "İngilizce'de bir'den yirmi'ye kadar olan sayıları ve onluk sistemi öğreniyoruz.",
+        en: "In English, we learn numbers from one to twenty and the decimal system.",
+        fr: "En anglais, nous apprenons les nombres de un à vingt et le système décimal."
+      },
       examples: [
-        { original: "1, 2, 3", translated: "One, Two, Three" }
+        createNumExample(1, "One"), createNumExample(2, "Two"), createNumExample(3, "Three"),
+        createNumExample(4, "Four"), createNumExample(5, "Five"), createNumExample(6, "Six"),
+        createNumExample(7, "Seven"), createNumExample(8, "Eight"), createNumExample(9, "Nine"),
+        createNumExample(10, "Ten"), createNumExample(11, "Eleven"), createNumExample(12, "Twelve"),
+        createNumExample(13, "Thirteen"), createNumExample(14, "Fourteen"), createNumExample(15, "Fifteen"),
+        createNumExample(16, "Sixteen"), createNumExample(17, "Seventeen"), createNumExample(18, "Eighteen"),
+        createNumExample(19, "Nineteen"), createNumExample(20, "Twenty"),
+        createNumExample(30, "Thirty"), createNumExample(40, "Forty"), createNumExample(50, "Fifty"),
+        createNumExample(60, "Sixty"), createNumExample(70, "Seventy"), createNumExample(80, "Eighty"),
+        createNumExample(90, "Ninety"), createNumExample(100, "Hundred")
       ]
     }
   },
   fr: {
     1: {
-      title: "L'Alphabet",
-      explanation: "L'alphabet français comprend 26 lettres.",
+      title: { tr: "Alfabe", en: "Alphabet", fr: "L'Alphabet" },
+      explanation: {
+        tr: "Fransız alfabesi 26 harften oluşur. 'y' harfi de bazen sesli sayılır.",
+        en: "The French alphabet has 26 letters. 'y' is sometimes treated as a vowel.",
+        fr: "L'alphabet français comprend 26 lettres. Le 'y' est parfois traité como une voyelle."
+      },
       examples: [
-        { original: "Voyelles", translated: "a, e, i, o, u, y" },
-        { original: "Consonants", translated: "b, c, d, f, g, ..." }
+        { 
+          label: { tr: "Sesli Harfler", en: "Vowels", fr: "Voyelles" }, 
+          content: "a, e, i, o, u, y" 
+        },
+        { 
+          label: { tr: "Sessiz Harfler", en: "Consonants", fr: "Consonnes" }, 
+          content: "b, c, d, f, g, ..." 
+        }
       ]
     },
     2: {
-      title: "Les Nombres",
-      explanation: "Apprenons à compter de 1 à 10.",
+      title: { tr: "Sayılar", en: "Numbers", fr: "Les Nombres" },
+      explanation: {
+        tr: "Fransızca'da sayı saymayı öğrenmek (1-20 ve onluklar) dili kullanmak için esastır.",
+        en: "Learning to count in French (1-20 and tens) is essential for using the language.",
+        fr: "Apprendre à compter en français (1-20 et dizaines) est essentiel pour utiliser la langue."
+      },
       examples: [
-        { original: "1, 2, 3", translated: "Un, Deux, Trois" }
+        createNumExample(1, "Un"), createNumExample(2, "Deux"), createNumExample(3, "Trois"),
+        createNumExample(4, "Quatre"), createNumExample(5, "Cinq"), createNumExample(6, "Six"),
+        createNumExample(7, "Sept"), createNumExample(8, "Huit"), createNumExample(9, "Neuf"),
+        createNumExample(10, "Dix"), createNumExample(11, "Onze"), createNumExample(12, "Douze"),
+        createNumExample(13, "Treize"), createNumExample(14, "Quatorze"), createNumExample(15, "Quinze"),
+        createNumExample(16, "Seize"), createNumExample(17, "Dix-sept"), createNumExample(18, "Dix-huit"),
+        createNumExample(19, "Dix-neuf"), createNumExample(20, "Vingt"),
+        createNumExample(30, "Trente"), createNumExample(40, "Quarante"), createNumExample(50, "Cinquante"),
+        createNumExample(60, "Soixante"), createNumExample(70, "Soixante-dix"), createNumExample(80, "Quatre-vingts"),
+        createNumExample(90, "Quatre-vingt-dix"), createNumExample(100, "Cent")
       ]
     }
   }
@@ -226,13 +287,57 @@ export const GRAMMAR_DATABASE: GrammarExercise[] = [
     level: 1
   },
   {
+    id: "tr-l1-g5",
+    language: "tr",
+    type: "ordering",
+    sentence: "Grup 5: R'den U'ya",
+    translations: { en: "Group 5: R to U", tr: "Grup 5: R'den U'ya", fr: "Groupe 5 : R à U" },
+    correctAnswer: "R,S,Ş,T,U",
+    options: ["Ş", "S", "U", "R", "T"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
+    id: "tr-l1-g6",
+    language: "tr",
+    type: "ordering",
+    sentence: "Grup 6: Ü'den Z'ye",
+    translations: { en: "Group 6: Ü to Z", tr: "Grup 6: Ü'den Z'ye", fr: "Groupe 6 : Ü à Z" },
+    correctAnswer: "Ü,V,Y,Z",
+    options: ["Z", "V", "Y", "Ü"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
     id: "tr-l1-vowel-1",
     language: "tr",
     type: "choice",
-    sentence: "Hangi harf bir 'sesli harf' (vowel) değildir?",
-    translations: { en: "Which letter is NOT a vowel?", tr: "Hangisi sesli bir harf değildir?", fr: "Quelle lettre n'est pas une voyelle ?" },
+    sentence: "Hangisi sesli harf değildir?",
+    translations: { en: "Which letter is NOT a vowel?", tr: "Hangisi sesli harf değildir?", fr: "Quelle lettre n'est pas une voyelle ?" },
     correctAnswer: "k",
     options: ["a", "e", "k"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
+    id: "tr-l1-vowel-2",
+    language: "tr",
+    type: "choice",
+    sentence: "Hangisi sesli harftir?",
+    translations: { en: "Which one is a vowel?", tr: "Hangisi sesli harftir?", fr: "Lequel est une voyelle ?" },
+    correctAnswer: "o",
+    options: ["h", "m", "o"],
+    topic: "Alfabe",
+    level: 1
+  },
+  {
+    id: "tr-l1-cons-1",
+    language: "tr",
+    type: "choice",
+    sentence: "Hangisi sessiz harftir?",
+    translations: { en: "Which one is a consonant?", tr: "Hangisi sessiz harftir?", fr: "Lequel est une consonne ?" },
+    correctAnswer: "b",
+    options: ["a", "u", "b"],
     topic: "Alfabe",
     level: 1
   },

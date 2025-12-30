@@ -104,6 +104,34 @@ const createNumExample = (n: number, word: string) => ({
   content: word
 });
 
+// Kelime oyunu seviye başlıkları
+export const VOCAB_LEVEL_INFO: Record<Language, Record<number, { title: Record<Language, string> }>> = {
+  tr: {
+    1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
+    2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
+    3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
+    4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
+    5: { title: { tr: "İsimler - II", en: "Nouns - II", fr: "Noms - II" } },
+    6: { title: { tr: "Fiiller - II", en: "Verbs - II", fr: "Verbes - II" } },
+  },
+  en: {
+    1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
+    2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
+    3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
+    4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
+    5: { title: { tr: "İsimler - II", en: "Nouns - II", fr: "Noms - II" } },
+    6: { title: { tr: "Fiiller - II", en: "Verbs - II", fr: "Verbes - II" } },
+  },
+  fr: {
+    1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
+    2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
+    3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
+    4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
+    5: { title: { tr: "İsimler - II", en: "Nouns - II", fr: "Noms - II" } },
+    6: { title: { tr: "Fiiller - II", en: "Verbs - II", fr: "Verbes - II" } },
+  }
+};
+
 // Grammar Level Info
 export const LEVEL_INFO: Record<Language, Record<number, LevelInfo>> = {
   tr: {
@@ -478,6 +506,12 @@ const createLevelWords = (level: number, words: [string, string, string, Categor
 };
 
 export const WORD_DATABASE: Word[] = [
-  ...createLevelWords(1, [['One', 'Un', 'Bir', 'Noun'], ['Time', 'Temps', 'Zaman', 'Noun'], ['Day', 'Jour', 'Gün', 'Noun'], ['Night', 'Nuit', 'Gece', 'Noun'], ['Week', 'Semaine', 'Hafta', 'Noun']]),
-  ...createLevelWords(2, [['Book', 'Livre', 'Kitap', 'Noun'], ['Pen', 'Stylo', 'Kalem', 'Noun'], ['Apple', 'Pomme', 'Elma', 'Noun'], ['Child', 'Enfant', 'Çocuk', 'Noun'], ['Table', 'Table', 'Masa', 'Noun']])
+  // Seviye 1: İsimler (Rarity 1)
+  ...createLevelWords(1, [['Time', 'Temps', 'Zaman', 'Noun'], ['Day', 'Jour', 'Gün', 'Noun'], ['Night', 'Nuit', 'Gece', 'Noun'], ['Week', 'Semaine', 'Hafta', 'Noun'], ['Month', 'Mois', 'Ay', 'Noun'], ['Year', 'An', 'Yıl', 'Noun'], ['Water', 'Eau', 'Su', 'Noun'], ['Food', 'Nourriture', 'Yemek', 'Noun'], ['People', 'Gens', 'İnsanlar', 'Noun'], ['Way', 'Chemin', 'Yol', 'Noun']]),
+  // Seviye 2: Fiiller (Rarity 2)
+  ...createLevelWords(2, [['To go', 'Aller', 'Gitmek', 'Verb'], ['To come', 'Venir', 'Gelmek', 'Verb'], ['To do', 'Faire', 'Yapmak', 'Verb'], ['To see', 'Voir', 'Görmek', 'Verb'], ['To want', 'Vouloir', 'İstemek', 'Verb'], ['To give', 'Donner', 'Vermek', 'Verb'], ['To say', 'Dire', 'Söylemek', 'Verb'], ['To take', 'Prendre', 'Almak', 'Verb'], ['To find', 'Trouver', 'Bulmak', 'Verb'], ['To know', 'Savoir', 'Bilmek', 'Verb']]),
+  // Seviye 3: Sıfatlar (Rarity 3)
+  ...createLevelWords(3, [['Good', 'Bon', 'İyi', 'Adjective'], ['Bad', 'Mauvais', 'Kötü', 'Adjective'], ['Big', 'Grand', 'Büyük', 'Adjective'], ['Small', 'Petit', 'Küçük', 'Adjective'], ['New', 'Nouveau', 'Yeni', 'Adjective'], ['Old', 'Vieux', 'Eski', 'Adjective'], ['Hard', 'Dur', 'Zor', 'Adjective'], ['Easy', 'Facile', 'Kolay', 'Adjective'], ['Beautiful', 'Beau', 'Güzel', 'Adjective'], ['Ugly', 'Laid', 'Çirkin', 'Adjective']]),
+  // Seviye 4: Zarflar (Rarity 4)
+  ...createLevelWords(4, [['Fast', 'Vite', 'Hızlı', 'Adverb'], ['Slowly', 'Lentement', 'Yavaşça', 'Adverb'], ['Very', 'Très', 'Çok', 'Adverb'], ['Now', 'Maintenant', 'Şimdi', 'Adverb'], ['Never', 'Jamais', 'Asla', 'Adverb'], ['Always', 'Toujours', 'Her zaman', 'Adverb'], ['Today', 'Aujourd\'hui', 'Bugün', 'Adverb'], ['Yesterday', 'Hier', 'Dün', 'Adverb'], ['Early', 'Tôt', 'Erken', 'Adverb'], ['Late', 'Tard', 'Geç', 'Adverb']]),
 ];

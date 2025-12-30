@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { GameState, Language, Word, GameMode, GrammarExercise } from './types';
-import { WORD_DATABASE, GRAMMAR_DATABASE, LANGUAGES, UI_TRANSLATIONS, CATEGORIES, LEVEL_INFO } from './constants';
+import { WORD_DATABASE, GRAMMAR_DATABASE, LANGUAGES, UI_TRANSLATIONS, CATEGORIES, LEVEL_INFO, VOCAB_LEVEL_INFO } from './constants';
 import { speakWord } from './geminiService';
 import Planet from './components/Planet';
 
@@ -41,8 +41,8 @@ const App: React.FC = () => {
     const points = [];
     for (let i = 0; i < 20; i++) {
       points.push({
-        x: 100 + i * 160, // 220'den 160'a düşürüldü (daha yakın)
-        y: 320 + Math.sin(i * 1.5) * 50 // 400'den 320'ye (daha yukarıda)
+        x: 100 + i * 160, 
+        y: 320 + Math.sin(i * 1.5) * 50 
       });
     }
     return points;
@@ -132,12 +132,23 @@ const App: React.FC = () => {
   }, []);
 
   const selectLevel = (level: number) => {
+    const isVocab = state.gameMode === 'vocabulary';
     const hasGrammar = GRAMMAR_DATABASE.some(g => g.level === level && g.language === state.targetLanguage);
+    const hasVocab = WORD_DATABASE.some(w => w.rarity === level);
     
+    if (isVocab && !hasVocab) {
+      alert("Bu seviye için henüz kelime içeriği yok.");
+      return;
+    }
+    if (!isVocab && !hasGrammar) {
+      alert("Bu seviye için henüz gramer içeriği yok.");
+      return;
+    }
+
     setState(prev => ({
       ...prev,
       currentMapLevel: level,
-      gameStatus: prev.gameMode === 'grammar' ? (hasGrammar ? 'explanation' : 'map') : 'playing',
+      gameStatus: prev.gameMode === 'grammar' ? 'explanation' : 'playing',
       correctAnswersInLevel: 0,
       totalAnswersInLevel: 0,
       seenItemIds: [],
@@ -146,9 +157,8 @@ const App: React.FC = () => {
       orderingState: []
     }));
 
-    if (state.gameMode === 'vocabulary' || (state.gameMode === 'grammar' && !hasGrammar)) {
-      if (state.gameMode === 'vocabulary') setTimeout(() => nextQuestion(), 50);
-      else alert("Bu seviye için henüz gramer içeriği yok.");
+    if (state.gameMode === 'vocabulary') {
+      setTimeout(() => nextQuestion(), 50);
     }
   };
 
@@ -189,11 +199,6 @@ const App: React.FC = () => {
   };
 
   const finishAnswer = (correct: boolean, answer: string) => {
-    const isVocab = state.gameMode === 'vocabulary';
-    if (correct && isVocab && state.currentWord) {
-      speakWord(state.currentWord[state.targetLanguage], LANGUAGES.find(l => l.code === state.targetLanguage)?.name || 'English');
-    }
-
     const nextTotalCount = state.totalAnswersInLevel + 1;
     const isLevelOver = nextTotalCount >= 10;
 
@@ -408,8 +413,15 @@ const App: React.FC = () => {
               const level = i + 1;
               const isUnlocked = level <= state.maxUnlockedLevel;
               const colors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6', '#10b981', '#22c55e', '#84cc16', '#eab308', '#f59e0b', '#f97316'];
-              const levelTitleData = LEVEL_INFO[state.targetLanguage]?.[level]?.title;
-              const levelTitle = levelTitleData ? levelTitleData[state.currentLanguage] : t('level') + " " + level;
+              
+              let levelTitle = t('level') + " " + level;
+              if (state.gameMode === 'vocabulary') {
+                const vocabInfo = VOCAB_LEVEL_INFO[state.currentLanguage]?.[level];
+                if (vocabInfo) levelTitle = vocabInfo.title[state.currentLanguage];
+              } else {
+                const grammarInfo = LEVEL_INFO[state.targetLanguage]?.[level];
+                if (grammarInfo) levelTitle = grammarInfo.title[state.currentLanguage];
+              }
 
               return (
                 <div 
@@ -442,7 +454,6 @@ const App: React.FC = () => {
     );
   }
 
-  // Seviye bilgilendirme sayfası
   if (state.gameStatus === 'explanation') {
     const topic = LEVEL_INFO[state.targetLanguage]?.[state.currentMapLevel];
     const nativeTitle = topic?.title[state.currentLanguage] || topic?.title['en'] || t('level') + " " + state.currentMapLevel;
@@ -495,7 +506,6 @@ const App: React.FC = () => {
     );
   }
 
-  // Oyun alanı
   if (state.gameStatus === 'playing') {
     const isVocab = state.gameMode === 'vocabulary';
     const exercise = state.currentExercise;
@@ -603,7 +613,6 @@ const App: React.FC = () => {
     );
   }
 
-  // Sonuç ekranları
   if (state.gameStatus === 'level-up' || state.gameStatus === 'level-failed') {
     const win = state.gameStatus === 'level-up';
     return (

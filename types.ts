@@ -8,19 +8,19 @@ export type GameMode = 'vocabulary' | 'grammar';
 export interface GrammarExercise {
   id: string;
   language: Language;
-  type: 'choice' | 'ordering'; // Yeni alan: Çoktan seçmeli mi yoksa sıralama mı?
+  type: 'choice' | 'ordering' | 'dialogue_completion'; 
   sentence: string;
   translations: Record<Language, string>;
-  correctAnswer: string; // Sıralama tipinde bu alan doğru dizilimi virgülle ayırarak (A,B,C) tutar
+  correctAnswer: string; 
   options: string[];
   topic: string;
   level: number;
 }
 
 export interface LevelInfo {
-  title: Record<string, string>; // Çok dilli başlık
-  explanation: Record<string, string>; // Çok dilli açıklama
-  examples: { label: Record<string, string>; content: string }[];
+  title: Record<string, string>; 
+  explanation: Record<string, string>; 
+  examples: { label: Record<string, string>; content: Record<string, string> }[];
 }
 
 export interface Word {
@@ -52,5 +52,5 @@ export interface GameState {
   totalAnswersInLevel: number;
   seenItemIds: string[];
   gameStatus: 'setup' | 'map' | 'explanation' | 'playing' | 'level-up' | 'level-failed' | 'finished';
-  orderingState?: string[]; // Sıralama soruları için geçici tutulan sıra
+  orderingState?: string[]; 
 }

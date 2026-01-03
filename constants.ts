@@ -36,7 +36,7 @@ export const UI_TRANSLATIONS: Record<Language, Record<string, string>> = {
     backToHome: "Back to home",
     startLesson: "Start Lesson",
     lessonTitle: "Lesson Briefing",
-    orderingInstruction: "Put them in order!",
+    orderingInstruction: "Complete the dialogue!",
     clear: "Clear"
   },
   tr: {
@@ -65,7 +65,7 @@ export const UI_TRANSLATIONS: Record<Language, Record<string, string>> = {
     backToHome: "Anasayfaya dön",
     startLesson: "Derse Başla",
     lessonTitle: "Görev Bilgilendirmesi",
-    orderingInstruction: "Sıraya diz!",
+    orderingInstruction: "Diyaloğu tamamla!",
     clear: "Temizle"
   },
   fr: {
@@ -94,45 +94,37 @@ export const UI_TRANSLATIONS: Record<Language, Record<string, string>> = {
     backToHome: "Retour à l'accueil",
     startLesson: "Commencer la leçon",
     lessonTitle: "Briefing de mission",
-    orderingInstruction: "Mettez en ordre !",
+    orderingInstruction: "Complétez le dialogue !",
     clear: "Effacer"
   }
 };
 
-const createNumExample = (n: number, word: string) => ({
-  label: { tr: n.toString(), en: n.toString(), fr: n.toString() },
-  content: word
+const createNumExample = (n: number, wordEn: string, wordFr: string, wordTr: string) => ({
+  label: { tr: wordTr, en: wordEn, fr: wordFr },
+  content: { tr: n.toString(), en: n.toString(), fr: n.toString() }
 });
 
-// Kelime oyunu seviye başlıkları
 export const VOCAB_LEVEL_INFO: Record<Language, Record<number, { title: Record<Language, string> }>> = {
   tr: {
     1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
     2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
     3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
     4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
-    5: { title: { tr: "İsimler - II", en: "Nouns - II", fr: "Noms - II" } },
-    6: { title: { tr: "Fiiller - II", en: "Verbs - II", fr: "Verbes - II" } },
   },
   en: {
     1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
     2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
     3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
     4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
-    5: { title: { tr: "İsimler - II", en: "Nouns - II", fr: "Noms - II" } },
-    6: { title: { tr: "Fiiller - II", en: "Verbs - II", fr: "Verbes - II" } },
   },
   fr: {
     1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
     2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
     3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
     4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
-    5: { title: { tr: "İsimler - II", en: "Nouns - II", fr: "Noms - II" } },
-    6: { title: { tr: "Fiiller - II", en: "Verbs - II", fr: "Verbes - II" } },
   }
 };
 
-// Grammar Level Info
 export const LEVEL_INFO: Record<Language, Record<number, LevelInfo>> = {
   tr: {
     1: {
@@ -143,375 +135,219 @@ export const LEVEL_INFO: Record<Language, Record<number, LevelInfo>> = {
         fr: "L'alphabet turc comprend 29 lettres. 8 sont des voyelles et 21 sont des consonnes."
       },
       examples: [
-        { 
-          label: { tr: "Sesli Harfler", en: "Vowels", fr: "Voyelles" }, 
-          content: "a, e, ı, i, o, ö, u, ü" 
-        },
-        { 
-          label: { tr: "Sessiz Harfler", en: "Consonants", fr: "Consonnes" }, 
-          content: "b, c, ç, d, f, g, ğ, h, j, k, l, m, n, p, r, s, ş, t, v, y, z" 
-        }
+        { label: { tr: "A", en: "A", fr: "A" }, content: { tr: "Araba", en: "Car", fr: "Voiture" } },
+        { label: { tr: "B", en: "B", fr: "B" }, content: { tr: "Baba", en: "Father", fr: "Père" } },
+        { label: { tr: "C", en: "C", fr: "C" }, content: { tr: "Ceviz", en: "Walnut", fr: "Noix" } },
+        { label: { tr: "Ç", en: "Ch", fr: "Ch" }, content: { tr: "Çiçek", en: "Flower", fr: "Fleur" } }
       ]
     },
     2: {
       title: { tr: "Sayılar", en: "Numbers", fr: "Les Nombres" },
       explanation: {
-        tr: "Türkçe sayılar onluk sisteme dayanır. Bir'den yirmi'ye kadar olan temel sayıları ve onluk ritmik saymayı öğreniyoruz.",
-        en: "Turkish numbers are based on the decimal system. We are learning basic numbers from one to twenty and counting by tens.",
-        fr: "Les nombres turcs sont basés sur le système décimal. Nous apprenons les nombres de base de un à vingt et le comptage par dizaines."
+        tr: "Türkçe sayılar onluk sisteme dayanır.",
+        en: "Turkish numbers are based on the decimal system.",
+        fr: "Les nombres turcs sont basés sur le système décimal."
       },
       examples: [
-        createNumExample(1, "Bir"), createNumExample(2, "İki"), createNumExample(3, "Üç"),
-        createNumExample(4, "Dört"), createNumExample(5, "Beş"), createNumExample(6, "Altı"),
-        createNumExample(7, "Yedi"), createNumExample(8, "Sekiz"), createNumExample(9, "Dokuz"),
-        createNumExample(10, "On"), createNumExample(11, "On Bir"), createNumExample(12, "On İki"),
-        createNumExample(13, "On Üç"), createNumExample(14, "On Dört"), createNumExample(15, "On Beş"),
-        createNumExample(16, "On Altı"), createNumExample(17, "On Yedi"), createNumExample(18, "On Sekiz"),
-        createNumExample(19, "On Dokuz"), createNumExample(20, "Yirmi"),
-        createNumExample(30, "Otuz"), createNumExample(40, "Kırk"), createNumExample(50, "Elli"),
-        createNumExample(60, "Altmış"), createNumExample(70, "Yetmiş"), createNumExample(80, "Seksen"),
-        createNumExample(90, "Doksan"), createNumExample(100, "Yüz")
+        createNumExample(1, "One", "Un", "Bir"), 
+        createNumExample(2, "Two", "Deux", "İki"), 
+        createNumExample(3, "Three", "Trois", "Üç"),
+        createNumExample(10, "Ten", "Dix", "On")
+      ]
+    },
+    3: {
+      title: { tr: "Selamlaşma ve Tanışma", en: "Greetings and Introductions", fr: "Salutations et Présentations" },
+      explanation: {
+        tr: "Selamlaşma ve tanışma, iletişimin ilk adımıdır. Türkçede selamlaşmalar hem resmî hem de samimî olabilir. Duruma, zamana ve karşımızdaki kişiye göre uygun ifadeyi seçeriz.",
+        en: "Greetings and introductions are the first steps. In Turkish, they can be formal or informal. We choose the appropriate expression based on the situation, time, and person.",
+        fr: "Les salutations et les présentations sont les premières étapes. En turc, elles peuvent être formelles ou informelles. Nous choisissons l'expression appropriée en fonction de la situation, du temps et de la personne."
+      },
+      examples: [
+        { 
+          label: { tr: "Merhaba", en: "Hello", fr: "Bonjour" }, 
+          content: { tr: "Günün her saati — genel selam", en: "Any time of day — general greeting", fr: "À tout moment — salutation générale" } 
+        },
+        { 
+          label: { tr: "Günaydın", en: "Good morning", fr: "Bonjour" }, 
+          content: { tr: "Sabah", en: "In the morning", fr: "Le matin" } 
+        },
+        { 
+          label: { tr: "İyi günler", en: "Good day", fr: "Bonne journée" }, 
+          content: { tr: "Gündüz — resmî", en: "Daytime — formal", fr: "Pendant la journée — formel" } 
+        },
+        { 
+          label: { tr: "İyi akşamlar", en: "Good evening", fr: "Bonsoir" }, 
+          content: { tr: "Akşam", en: "Evening", fr: "Le soir" } 
+        },
+        { 
+          label: { tr: "İyi geceler", en: "Good night", fr: "Bonne nuit" }, 
+          content: { tr: "Gece — hem selam hem veda", en: "Night — both greeting and farewell", fr: "Nuit — à la fois salutation et adieu" } 
+        },
+        { 
+          label: { tr: "Selam", en: "Hi", fr: "Salut" }, 
+          content: { tr: "Samimî, arkadaşça", en: "Casual, friendly", fr: "Informel, amical" } 
+        },
+        { 
+          label: { tr: "N'aber?", en: "What's up?", fr: "Quoi de neuf ?" }, 
+          content: { tr: "Samimî ('Ne haber'in kısaltması)", en: "Casual (Short for 'What news')", fr: "Informel (Abréviation de 'Quelles nouvelles')" } 
+        },
+        { 
+          label: { tr: "Teşekkürler", en: "Thanks", fr: "Merci" }, 
+          content: { tr: "Nezaket ifadesi", en: "Expression of gratitude", fr: "Expression de gratitude" } 
+        },
+        { 
+          label: { tr: "Benim adım ...", en: "My name is ...", fr: "Je m'appelle ..." }, 
+          content: { tr: "Kendimizi tanıtırız", en: "Introduce ourselves", fr: "Se présenter" } 
+        },
+        { 
+          label: { tr: "Senin adın ne?", en: "What is your name?", fr: "Comment t'appelles-tu ?" }, 
+          content: { tr: "Samimî soru", en: "Casual question", fr: "Question informelle" } 
+        },
+        { 
+          label: { tr: "Sizin adınız ne?", en: "What is your name? (Formal)", fr: "Comment vous appelez-vous ?" }, 
+          content: { tr: "Resmî soru", en: "Formal question", fr: "Question formelle" } 
+        },
+        { 
+          label: { tr: "Memnun oldum", en: "Nice to meet you", fr: "Enchanté" }, 
+          content: { tr: "Tanışma sonunda söylenir", en: "Said at the end of meeting", fr: "Dit à la fin d'une rencontre" } 
+        },
+        { 
+          label: { tr: "Ben de memnun oldum", en: "Nice to meet you too", fr: "Enchanté aussi" }, 
+          content: { tr: "Karşılık ifadesi", en: "The response", fr: "La réponse" } 
+        },
+        { 
+          label: { tr: "Görüşürüz", en: "See you", fr: "À bientôt" }, 
+          content: { tr: "Veda ifadesi", en: "Farewell expression", fr: "Expression d'adieu" } 
+        },
+        { 
+          label: { tr: "Hoşça kal", en: "Goodbye", fr: "Au revoir" }, 
+          content: { tr: "Kalana söylenir", en: "Said to the one staying", fr: "Dit à celui qui reste" } 
+        },
+        { 
+          label: { tr: "Güle güle", en: "Goodbye", fr: "Au revoir" }, 
+          content: { tr: "Gidene söylenir", en: "Said to the one leaving", fr: "Dit à celui qui part" } 
+        },
+        {
+          label: { tr: "Mini Diyalog", en: "Mini Dialog", fr: "Mini Dialogue" },
+          content: { 
+            tr: "- Merhaba, ben Yunus.\n- Merhaba, ben Ayşe. Memnun oldum.\n- Ben de memnun oldum.\n- Nasılsınız?\n- İyiyim, teşekkür ederim. Siz nasılsınız?\n- Ben de iyiyim, teşekkürler.", 
+            en: "- Hello, I'm Yunus.\n- Hello, I'm Ayşe. Nice to meet you.\n- Nice to meet you too.\n- How are you?\n- I'm fine, thank you. How are you?\n- I'm fine too, thanks.", 
+            fr: "- Bonjour, je suis Yunus.\n- Bonjour, je suis Ayşe. Enchantée.\n- Enchanté aussi.\n- Comment allez-vous ?\n- Je vais bien, merci. Et vous ?\n- Je vais bien aussi, merci." 
+          }
+        }
       ]
     }
   },
   en: {
     1: {
       title: { tr: "Alfabe", en: "Alphabet", fr: "L'Alphabet" },
-      explanation: {
-        tr: "İngiliz alfabesi 26 harften oluşur: 5 sesli ve 21 sessiz harf.",
-        en: "The English alphabet consists of 26 letters: 5 vowels and 21 consonants.",
-        fr: "L'alphabet anglais se compose de 26 lettres : 5 voyelles et 21 consonnes."
-      },
-      examples: [
-        { 
-          label: { tr: "Sesli Harfler", en: "Vowels", fr: "Voyelles" }, 
-          content: "a, e, i, o, u" 
-        },
-        { 
-          label: { tr: "Sessiz Harfler", en: "Consonants", fr: "Consonnes" }, 
-          content: "b, c, d, f, g, ..." 
-        }
-      ]
-    },
-    2: {
-      title: { tr: "Sayılar", en: "Numbers", fr: "Les Nombres" },
-      explanation: {
-        tr: "İngilizce'de bir'den yirmi'ye kadar olan sayıları ve onluk sistemi öğreniyoruz.",
-        en: "In English, we learn numbers from one to twenty and the decimal system.",
-        fr: "En anglais, nous apprenons les nombres de un à vingt et le système décimal."
-      },
-      examples: [
-        createNumExample(1, "One"), createNumExample(2, "Two"), createNumExample(3, "Three"),
-        createNumExample(4, "Four"), createNumExample(5, "Five"), createNumExample(6, "Six"),
-        createNumExample(7, "Seven"), createNumExample(8, "Eight"), createNumExample(9, "Nine"),
-        createNumExample(10, "Ten"), createNumExample(11, "Eleven"), createNumExample(12, "Twelve"),
-        createNumExample(13, "Thirteen"), createNumExample(14, "Fourteen"), createNumExample(15, "Fifteen"),
-        createNumExample(16, "Sixteen"), createNumExample(17, "Seventeen"), createNumExample(18, "Eighteen"),
-        createNumExample(19, "Nineteen"), createNumExample(20, "Twenty"),
-        createNumExample(30, "Thirty"), createNumExample(40, "Forty"), createNumExample(50, "Fifty"),
-        createNumExample(60, "Sixty"), createNumExample(70, "Seventy"), createNumExample(80, "Eighty"),
-        createNumExample(90, "Ninety"), createNumExample(100, "Hundred")
-      ]
+      explanation: { tr: "İngiliz alfabesi 26 harften oluşur.", en: "English alphabet has 26 letters.", fr: "L'alphabet anglais a 26 lettres." },
+      examples: [{ label: { tr: "Apple", en: "Apple", fr: "Pomme" }, content: { tr: "Elma", en: "Apple", fr: "Pomme" } }]
     }
   },
   fr: {
     1: {
       title: { tr: "Alfabe", en: "Alphabet", fr: "L'Alphabet" },
-      explanation: {
-        tr: "Fransız alfabesi 26 harften oluşur. 'y' harfi de bazen sesli sayılır.",
-        en: "The French alphabet has 26 letters. 'y' is sometimes treated as a vowel.",
-        fr: "L'alphabet français comprend 26 lettres. Le 'y' est parfois traité como une voyelle."
-      },
-      examples: [
-        { 
-          label: { tr: "Sesli Harfler", en: "Vowels", fr: "Voyelles" }, 
-          content: "a, e, i, o, u, y" 
-        },
-        { 
-          label: { tr: "Sessiz Harfler", en: "Consonants", fr: "Consonnes" }, 
-          content: "b, c, d, f, g, ..." 
-        }
-      ]
-    },
-    2: {
-      title: { tr: "Sayılar", en: "Numbers", fr: "Les Nombres" },
-      explanation: {
-        tr: "Fransızca'da sayı saymayı öğrenmek (1-20 ve onluklar) dili kullanmak için esastır.",
-        en: "Learning to count in French (1-20 and tens) is essential for using the language.",
-        fr: "Apprendre à compter en français (1-20 et dizaines) est essentiel pour utiliser la langue."
-      },
-      examples: [
-        createNumExample(1, "Un"), createNumExample(2, "Deux"), createNumExample(3, "Trois"),
-        createNumExample(4, "Quatre"), createNumExample(5, "Cinq"), createNumExample(6, "Six"),
-        createNumExample(7, "Sept"), createNumExample(8, "Huit"), createNumExample(9, "Neuf"),
-        createNumExample(10, "Dix"), createNumExample(11, "Onze"), createNumExample(12, "Douze"),
-        createNumExample(13, "Treize"), createNumExample(14, "Quatorze"), createNumExample(15, "Quinze"),
-        createNumExample(16, "Seize"), createNumExample(17, "Dix-sept"), createNumExample(18, "Dix-huit"),
-        createNumExample(19, "Dix-neuf"), createNumExample(20, "Vingt"),
-        createNumExample(30, "Trente"), createNumExample(40, "Quarante"), createNumExample(50, "Cinquante"),
-        createNumExample(60, "Soixante"), createNumExample(70, "Soixante-dix"), createNumExample(80, "Quatre-vingts"),
-        createNumExample(90, "Quatre-vingt-dix"), createNumExample(100, "Cent")
-      ]
+      explanation: { tr: "Fransız alfabesi 26 harften oluşur.", en: "French alphabet has 26 letters.", fr: "L'alphabet français a 26 lettres." },
+      examples: [{ label: { tr: "Avion", en: "Airplane", fr: "Avion" }, content: { tr: "Uçak", en: "Airplane", fr: "Avion" } }]
     }
   }
 };
 
-// Grammar Exercises
 export const GRAMMAR_DATABASE: GrammarExercise[] = [
-  // --- TÜRKÇE SEVİYE 1: ALFABE ---
+  // --- TÜRKÇE SEVİYE 3: SELAMLAŞMA VE TANIŞMA (DİYALOG TAMAMLAMA) ---
+  // Kural: 5 Boşluk, 6 Kelime (5 doğru, 1 yanlış)
   {
-    id: "tr-l1-full",
-    language: "tr",
-    type: "ordering",
-    sentence: "TÜM ALFABE: Harflerin tamamını doğru sıraya diz!",
-    translations: { en: "FULL ALPHABET: Put all letters in order!", tr: "TÜM ALFABE: Tüm harfleri sıraya diz!", fr: "ALPHABET COMPLET : Mettez toutes les lettres dans l'ordre !" },
-    correctAnswer: "A,B,C,Ç,D,E,F,G,Ğ,H,I,İ,J,K,L,M,N,O,Ö,P,R,S,Ş,T,U,Ü,V,Y,Z",
-    options: ["A", "B", "C", "Ç", "D", "E", "F", "G", "Ğ", "H", "I", "İ", "J", "K", "L", "M", "N", "O", "Ö", "P", "R", "S", "Ş", "T", "U", "Ü", "V", "Y", "Z"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d1", language: "tr", type: "dialogue_completion",
+    sentence: "Ali: Selam Ayşe, [1]? \nAyşe: [2], sen nasılsın? \nAli: Ben de [3]. [4] oldum. \nAyşe: Ben [5] memnun oldum.",
+    translations: { en: "Greeting and meeting dialog.", tr: "Selamlaşma ve tanışma diyaloğu.", fr: "Dialogue de salutation et de rencontre." },
+    correctAnswer: "nasılsın,İyiyim,iyiyim,Memnun,de", 
+    options: ["nasılsın", "iyiyim", "İyiyim", "Memnun", "de", "Görüşürüz"], 
+    topic: "Tanışma", level: 3
   },
   {
-    id: "tr-l1-g1",
-    language: "tr",
-    type: "ordering",
-    sentence: "Grup 1: A'dan D'ye",
-    translations: { en: "Group 1: A to D", tr: "Grup 1: A'dan D'ye", fr: "Groupe 1 : A à D" },
-    correctAnswer: "A,B,C,Ç,D",
-    options: ["B", "Ç", "A", "D", "C"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d2", language: "tr", type: "dialogue_completion",
+    sentence: "Öğrenci: [1] öğretmenim. \nÖğretmen: Günaydın [2], [3]? \nÖğrenci: [4] öğretmenim. \nÖğretmen: [5] nasılsınız?.",
+    translations: { en: "Morning greeting at school.", tr: "Okulda sabah selamlaşması.", fr: "Salutation du matin à l'école." },
+    correctAnswer: "Günaydın,Ahmet,nasılsın,İyiyim,Siz", 
+    options: ["Günaydın", "Ahmet", "nasılsın", "İyiyim", "Siz", "Hayır"], 
+    topic: "Okul", level: 3
   },
   {
-    id: "tr-l1-g2",
-    language: "tr",
-    type: "ordering",
-    sentence: "Grup 2: E'den H'ye",
-    translations: { en: "Group 2: E to H", tr: "Grup 2: E'den H'ye", fr: "Groupe 2 : E à H" },
-    correctAnswer: "E,F,G,Ğ,H",
-    options: ["Ğ", "F", "H", "E", "G"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d3", language: "tr", type: "dialogue_completion",
+    sentence: "Can: [1] akşamlar. \nSu: İyi akşamlar, [2] [3]? \nCan: [4], teşekkürler. Siz nasılsınız? \nSu: [5] de iyiyim.",
+    translations: { en: "Evening greeting.", tr: "Akşam selamlaşması.", fr: "Salutation du soir." },
+    correctAnswer: "İyi,nasılsınız,efendim,İyiyim,Ben", 
+    options: ["İyi", "nasılsınız", "efendim", "İyiyim", "Ben", "Kötü"], 
+    topic: "Resmî Selamlaşma", level: 3
   },
   {
-    id: "tr-l1-g3",
-    language: "tr",
-    type: "ordering",
-    sentence: "Grup 3: I'dan L'ye",
-    translations: { en: "Group 3: I to L", tr: "Grup 3: I'dan L'ye", fr: "Groupe 3 : I à L" },
-    correctAnswer: "I,İ,J,K,L",
-    options: ["İ", "J", "L", "I", "K"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d4", language: "tr", type: "dialogue_completion",
+    sentence: "A: Selam, [1]? \nB: İyilik, [2] n'aber? \nA: Benden de [3]. Tanıştığımıza [4] oldum.",
+    translations: { en: "Informal greeting.", tr: "Samimî selamlaşma.", fr: "Salutation informelle." },
+    correctAnswer: "n'aber,senden,iyilik,memnun", 
+    options: ["n'aber", "senden", "iyilik", "memnun", "Selam"], 
+    topic: "Samimî", level: 3
   },
   {
-    id: "tr-l1-g4",
-    language: "tr",
-    type: "ordering",
-    sentence: "Grup 4: M'den P'ye",
-    translations: { en: "Group 4: M to P", tr: "Grup 4: M'den P'ye", fr: "Groupe 4 : M à P" },
-    correctAnswer: "M,N,O,Ö,P",
-    options: ["O", "N", "P", "M", "Ö"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d5", language: "tr", type: "dialogue_completion",
+    sentence: "Anne: [1] geceler tatlım. \nBebek: İyi [2] anne. \nAnne: [3] uykular. \nBebek: [4] da iyi [5].",
+    translations: { en: "Bedtime dialog.", tr: "Uyku vakti diyaloğu.", fr: "Dialogue du coucher." },
+    correctAnswer: "İyi,geceler,Tatlı,Sana,uykular", 
+    options: ["İyi", "geceler", "Tatlı", "Sana", "uykular", "Sabah"], 
+    topic: "Gece", level: 3
   },
   {
-    id: "tr-l1-g5",
-    language: "tr",
-    type: "ordering",
-    sentence: "Grup 5: R'den U'ya",
-    translations: { en: "Group 5: R to U", tr: "Grup 5: R'den U'ya", fr: "Groupe 5 : R à U" },
-    correctAnswer: "R,S,Ş,T,U",
-    options: ["Ş", "S", "U", "R", "T"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d6", language: "tr", type: "dialogue_completion",
+    sentence: "Okul Müdürü: [1] günler, hoş geldiniz. \nMüşteri: [2] buldum. \nOkul Müdürü: [3] [4] ne? \nMüşteri: [5] adım John.",
+    translations: { en: "At a restaurant.", tr: "Restoranda selamlaşma.", fr: "Au restaurant." },
+    correctAnswer: "İyi,Hoş,Sizin,adınız,Benim", 
+    options: ["İyi", "Hoş", "Sizin", "adınız", "Benim", "Yemek"], 
+    topic: "Resmî", level: 3
   },
   {
-    id: "tr-l1-g6",
-    language: "tr",
-    type: "ordering",
-    sentence: "Grup 6: Ü'den Z'ye",
-    translations: { en: "Group 6: Ü to Z", tr: "Grup 6: Ü'den Z'ye", fr: "Groupe 6 : Ü à Z" },
-    correctAnswer: "Ü,V,Y,Z",
-    options: ["Z", "V", "Y", "Ü"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d7", language: "tr", type: "dialogue_completion",
+    sentence: "A: Merhaba, [1]? \nB: Merhaba, [2]. Senin [3] ne? \nA: [4] [5] Elif.",
+    translations: { en: "Basic meeting.", tr: "Temel tanışma.", fr: "Rencontre de base." },
+    correctAnswer: "nasılsın,iyiyim,adın,Benim,adım", 
+    options: ["nasılsın", "adım", "iyiyim", "adın", "Benim", "Televizyon"], 
+    topic: "Tanışma", level: 3
   },
   {
-    id: "tr-l1-vowel-1",
-    language: "tr",
-    type: "choice",
-    sentence: "Hangisi sesli harf değildir?",
-    translations: { en: "Which letter is NOT a vowel?", tr: "Hangisi sesli harf değildir?", fr: "Quelle lettre n'est pas une voyelle ?" },
-    correctAnswer: "k",
-    options: ["a", "e", "k"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d8", language: "tr", type: "dialogue_completion",
+    sentence: "Müdür: [1] günler, [2] Bey. \nPersonel: İyi [3], Ahmet Bey. \nMüdür: Tanıştığımıza [4] oldum. \nPersonel: [5] de.",
+    translations: { en: "Office greeting.", tr: "Ofis selamlaşması.", fr: "Salutation au bureau." },
+    correctAnswer: "İyi,Hakan,günler,memnun,Ben", 
+    options: ["İyi", "Hakan", "günler", "memnun", "Ben", "Çay"], 
+    topic: "İş Dünyası", level: 3
   },
   {
-    id: "tr-l1-vowel-2",
-    language: "tr",
-    type: "choice",
-    sentence: "Hangisi sesli harftir?",
-    translations: { en: "Which one is a vowel?", tr: "Hangisi sesli harftir?", fr: "Lequel est une voyelle ?" },
-    correctAnswer: "o",
-    options: ["h", "m", "o"],
-    topic: "Alfabe",
-    level: 1
+    id: "tr-l3-d9", language: "tr", type: "dialogue_completion",
+    sentence: "Ece: [1] kal Ayşe. \nAyşe: [2] [3] git Ece. \nEce: Yarın [4]. \nAyşe: [5] üzere.",
+    translations: { en: "Saying goodbye.", tr: "Vedalaşma diyaloğu.", fr: "Dire au revoir." },
+    correctAnswer: "Hoşça,Güle,güle,görüşürüz,Görüşmek", 
+    options: ["Hoşça", "Güle", "güle", "görüşürüz", "Görüşmek", "Selam"], 
+    topic: "Veda", level: 3
   },
   {
-    id: "tr-l1-cons-1",
-    language: "tr",
-    type: "choice",
-    sentence: "Hangisi sessiz harftir?",
-    translations: { en: "Which one is a consonant?", tr: "Hangisi sessiz harftir?", fr: "Lequel est une consonne ?" },
-    correctAnswer: "b",
-    options: ["a", "u", "b"],
-    topic: "Alfabe",
-    level: 1
-  },
-
-  // --- TÜRKÇE SEVİYE 2: SAYILAR ---
-  {
-    id: "tr-l2-ord-1",
-    language: "tr",
-    type: "ordering",
-    sentence: "1'den 5'e kadar sayıları sıraya diz!",
-    translations: { en: "Order numbers from 1 to 5!", tr: "1'den 5'e kadar sayıları sıraya diz!", fr: "Ordonnez les nombres de 1 à 5 !" },
-    correctAnswer: "Bir,İki,Üç,Dört,Beş",
-    options: ["İki", "Dört", "Bir", "Beş", "Üç"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-ord-2",
-    language: "tr",
-    type: "ordering",
-    sentence: "6'dan 10'a kadar sayıları sıraya diz!",
-    translations: { en: "Order numbers from 6 to 10!", tr: "6'dan 10'a kadar sayıları sıraya diz!", fr: "Ordonnez les nombres de 6 à 10 !" },
-    correctAnswer: "Altı,Yedi,Sekiz,Dokuz,On",
-    options: ["Dokuz", "Altı", "On", "Yedi", "Sekiz"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-ord-10s",
-    language: "tr",
-    type: "ordering",
-    sentence: "10'ar 10'ar 100'e kadar sayıları sıraya diz!",
-    translations: { en: "Order numbers by 10s up to 100!", tr: "10'ar 10'ar 100'e kadar sayıları sıraya diz!", fr: "Ordonnez les nombres par 10 jusqu'à 100 !" },
-    correctAnswer: "On,Yirmi,Otuz,Kırk,Elli,Altmış,Yetmiş,Seksen,Doksan,Yüz",
-    options: ["Elli", "On", "Altmış", "Doksan", "Yirmi", "Yüz", "Otuz", "Yetmiş", "Seksen", "Kırk"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-choice-1",
-    language: "tr",
-    type: "choice",
-    sentence: "3 sayısının yazılışı hangisidir?",
-    translations: { en: "Number: 3. Which one is the written form?", tr: "3 sayısının yazılışı hangisidir?", fr: "Nombre : 3. Quelle est la forme écrite ?" },
-    correctAnswer: "Üç",
-    options: ["İki", "Üç", "Dört"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-choice-2",
-    language: "tr",
-    type: "choice",
-    sentence: "5 sayısının yazılışı hangisidir?",
-    translations: { en: "Number: 5. Which one is the written form?", tr: "5 sayısının yazılışı hangisidir?", fr: "Nombre : 5. Quelle est la forme écrite ?" },
-    correctAnswer: "Beş",
-    options: ["Beş", "Altı", "Yedi"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-choice-3",
-    language: "tr",
-    type: "choice",
-    sentence: "Yedi sayısının rakamla yazılışı hangisidir?",
-    translations: { en: "Written: 'Yedi'. Which digit is it?", tr: "'Yedi' yazılışı hangi rakamdır?", fr: "Écrit : 'Yedi'. Quel chiffre est-ce ?" },
-    correctAnswer: "7",
-    options: ["6", "7", "8"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-choice-4",
-    language: "tr",
-    type: "choice",
-    sentence: "10 sayısının yazılışı hangisidir?",
-    translations: { en: "Number: 10. Which one is the written form?", tr: "10 sayısının yazılışı hangisidir?", fr: "Nombre : 10. Quelle est la forme écrite ?" },
-    correctAnswer: "On",
-    options: ["On", "Yirmi", "Otuz"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-choice-5",
-    language: "tr",
-    type: "choice",
-    sentence: "20 sayısının yazılışı hangisidir?",
-    translations: { en: "Number: 20. Which one is the written form?", tr: "20 sayısının yazılışı hangisidir?", fr: "Nombre : 20. Quelle est la forme écrite ?" },
-    correctAnswer: "Yirmi",
-    options: ["On", "Yirmi", "Kırk"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-choice-6",
-    language: "tr",
-    type: "choice",
-    sentence: "12 sayısının yazılışı hangisidir?",
-    translations: { en: "Number: 12. Which one is the written form?", tr: "12 sayısının yazılışı hangisidir?", fr: "Nombre : 12. Quelle est la forme écrite ?" },
-    correctAnswer: "On İki",
-    options: ["On İki", "On Bir", "On Üç"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-choice-7",
-    language: "tr",
-    type: "choice",
-    sentence: "100 sayısının yazılışı hangisidir?",
-    translations: { en: "Number: 100. Which one is the written form?", tr: "100 sayısının yazılışı hangisidir?", fr: "Nombre : 100. Quelle est la forme écrite ?" },
-    correctAnswer: "Yüz",
-    options: ["Yüz", "Bin", "On"],
-    topic: "Sayılar",
-    level: 2
-  },
-  {
-    id: "tr-l2-choice-8",
-    language: "tr",
-    type: "choice",
-    sentence: "Elli sayısının sayıyla yazılışı hangisidir?",
-    translations: { en: "Written: 'Fifty'. Which digit is it?", tr: "'Elli' yazılışı hangi rakamdır?", fr: "Écrit : 'Cinquante'. Quel chiffre est-ce ?" },
-    correctAnswer: "50",
-    options: ["40", "50", "60"],
-    topic: "Sayılar",
-    level: 2
+    id: "tr-l3-d10", language: "tr", type: "dialogue_completion",
+    sentence: "Yolcu: [1] [2] efendim. \nŞoför: Teşekkürler, [3] de. \nYolcu: [4] [5] ne?",
+    translations: { en: "Taxi driver dialog.", tr: "Taksi şoförü ile diyalog.", fr: "Dialogue avec un chauffeur de taxi." },
+    correctAnswer: "İyi,günler,size,Sizin,adınız", 
+    options: ["İyi", "günler", "size", "Sizin", "adınız", "Nereye"], 
+    topic: "Ulaşım", level: 3
   }
 ];
 
 const createLevelWords = (level: number, words: [string, string, string, Category][]): Word[] => {
   return words.map((w, i) => ({
     id: `l${level}-${i}`,
-    en: w[0],
-    fr: w[1],
-    tr: w[2],
-    category: w[3],
-    rarity: level
+    en: w[0], fr: w[1], tr: w[2], category: w[3], rarity: level
   }))
 };
 
 export const WORD_DATABASE: Word[] = [
-  // Seviye 1: İsimler (Rarity 1)
-  ...createLevelWords(1, [['Time', 'Temps', 'Zaman', 'Noun'], ['Day', 'Jour', 'Gün', 'Noun'], ['Night', 'Nuit', 'Gece', 'Noun'], ['Week', 'Semaine', 'Hafta', 'Noun'], ['Month', 'Mois', 'Ay', 'Noun'], ['Year', 'An', 'Yıl', 'Noun'], ['Water', 'Eau', 'Su', 'Noun'], ['Food', 'Nourriture', 'Yemek', 'Noun'], ['People', 'Gens', 'İnsanlar', 'Noun'], ['Way', 'Chemin', 'Yol', 'Noun']]),
-  // Seviye 2: Fiiller (Rarity 2)
-  ...createLevelWords(2, [['To go', 'Aller', 'Gitmek', 'Verb'], ['To come', 'Venir', 'Gelmek', 'Verb'], ['To do', 'Faire', 'Yapmak', 'Verb'], ['To see', 'Voir', 'Görmek', 'Verb'], ['To want', 'Vouloir', 'İstemek', 'Verb'], ['To give', 'Donner', 'Vermek', 'Verb'], ['To say', 'Dire', 'Söylemek', 'Verb'], ['To take', 'Prendre', 'Almak', 'Verb'], ['To find', 'Trouver', 'Bulmak', 'Verb'], ['To know', 'Savoir', 'Bilmek', 'Verb']]),
-  // Seviye 3: Sıfatlar (Rarity 3)
-  ...createLevelWords(3, [['Good', 'Bon', 'İyi', 'Adjective'], ['Bad', 'Mauvais', 'Kötü', 'Adjective'], ['Big', 'Grand', 'Büyük', 'Adjective'], ['Small', 'Petit', 'Küçük', 'Adjective'], ['New', 'Nouveau', 'Yeni', 'Adjective'], ['Old', 'Vieux', 'Eski', 'Adjective'], ['Hard', 'Dur', 'Zor', 'Adjective'], ['Easy', 'Facile', 'Kolay', 'Adjective'], ['Beautiful', 'Beau', 'Güzel', 'Adjective'], ['Ugly', 'Laid', 'Çirkin', 'Adjective']]),
-  // Seviye 4: Zarflar (Rarity 4)
-  ...createLevelWords(4, [['Fast', 'Vite', 'Hızlı', 'Adverb'], ['Slowly', 'Lentement', 'Yavaşça', 'Adverb'], ['Very', 'Très', 'Çok', 'Adverb'], ['Now', 'Maintenant', 'Şimdi', 'Adverb'], ['Never', 'Jamais', 'Asla', 'Adverb'], ['Always', 'Toujours', 'Her zaman', 'Adverb'], ['Today', 'Aujourd\'hui', 'Bugün', 'Adverb'], ['Yesterday', 'Hier', 'Dün', 'Adverb'], ['Early', 'Tôt', 'Erken', 'Adverb'], ['Late', 'Tard', 'Geç', 'Adverb']]),
+  ...createLevelWords(1, [['Time', 'Temps', 'Zaman', 'Noun'], ['Day', 'Jour', 'Gün', 'Noun'], ['Night', 'Nuit', 'Gece', 'Noun']]),
+  ...createLevelWords(2, [['To go', 'Aller', 'Gitmek', 'Verb'], ['To come', 'Venir', 'Gelmek', 'Verb']]),
+  ...createLevelWords(3, [['Good', 'Bon', 'İyi', 'Adjective'], ['Bad', 'Mauvais', 'Kötü', 'Adjective']]),
 ];

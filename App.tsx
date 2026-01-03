@@ -36,7 +36,6 @@ const App: React.FC = () => {
     return translations[key] || key;
   };
 
-  // Harita noktalarını daha yakın ve yukarıda olacak şekilde güncelle
   const mapPathPoints = useMemo(() => {
     const points = [];
     for (let i = 0; i < 20; i++) {
@@ -48,7 +47,6 @@ const App: React.FC = () => {
     return points;
   }, []);
 
-  // Rastgele yıldız ve nebula verilerini oluştur
   const spaceBackground = useMemo(() => {
     const stars = Array.from({ length: 150 }).map((_, i) => ({
       id: i,
@@ -173,13 +171,14 @@ const App: React.FC = () => {
     const isVocab = state.gameMode === 'vocabulary';
     const exercise = state.currentExercise;
     
-    if (!isVocab && exercise?.type === 'ordering') {
+    // Sıralama veya Diyalog Tamamlama Modu
+    if (!isVocab && (exercise?.type === 'ordering' || exercise?.type === 'dialogue_completion')) {
       const currentOrder = [...(state.orderingState || []), answer];
-      const remainingOptions = state.options.filter(o => !currentOrder.includes(o));
+      const requiredLength = exercise.type === 'dialogue_completion' ? 5 : exercise.options.length;
       
       setState(prev => ({ ...prev, orderingState: currentOrder }));
 
-      if (remainingOptions.length === 0) {
+      if (currentOrder.length === requiredLength) {
         setTimeout(() => {
           const correctOrder = exercise.correctAnswer;
           const userOrder = currentOrder.join(',');
@@ -232,22 +231,22 @@ const App: React.FC = () => {
     const isVocab = state.gameMode === 'vocabulary';
     const exercise = state.currentExercise;
 
-    if (!isVocab && exercise?.type === 'ordering') {
+    if (!isVocab && (exercise?.type === 'ordering' || exercise?.type === 'dialogue_completion')) {
       const isSelected = state.orderingState?.includes(option);
-      const isLargeSet = state.options.length > 8;
+      const isLargeSet = state.options.length > 5;
       
-      const baseSize = isLargeSet ? "px-2 py-3 text-sm sm:text-base" : "px-3 py-4 text-lg sm:text-xl";
-      const base = `${baseSize} rounded-xl font-black transition-all border-2 flex items-center justify-center transform active:scale-90 break-words text-center leading-tight `;
+      const baseSize = isLargeSet ? "px-3 py-3 text-sm sm:text-base" : "px-4 py-5 text-lg sm:text-xl";
+      const base = `${baseSize} rounded-2xl font-black transition-all border-2 flex items-center justify-center transform active:scale-90 break-words text-center leading-tight shadow-lg `;
       
       if (state.selectedOption !== null) {
         const correctOrder = exercise.correctAnswer;
         const isNowCorrect = state.selectedOption === correctOrder;
-        return base + (isNowCorrect ? "bg-emerald-600 border-emerald-400" : "bg-rose-600 border-rose-400");
+        return base + (isNowCorrect ? "bg-emerald-600 border-emerald-400" : "bg-rose-600 border-rose-400 opacity-50");
       }
 
       return isSelected 
         ? base + "bg-indigo-600 border-indigo-400 opacity-20 scale-90" 
-        : base + "bg-slate-800 border-slate-700 hover:border-indigo-500 text-white shadow-lg";
+        : base + "bg-slate-800 border-slate-700 hover:border-indigo-500 text-white";
     }
 
     const correctAnswer = isVocab 
@@ -271,6 +270,43 @@ const App: React.FC = () => {
     }
 
     return base + "bg-slate-900 border-slate-800 opacity-40 grayscale text-slate-500";
+  };
+
+  const renderDialogue = (sentence: string, answers: string[]) => {
+    const lines = sentence.split('\n');
+    return (
+      <div className="space-y-4 w-full max-w-lg mx-auto">
+        {lines.map((line, idx) => {
+          const isA = line.startsWith('A:') || line.startsWith('Ali:') || line.startsWith('Öğrenci:') || line.startsWith('Anne:') || line.startsWith('Garson:') || line.startsWith('Ece:') || line.startsWith('Yolcu:');
+          let content = line.includes(':') ? line.split(':')[1].trim() : line;
+          const speaker = line.includes(':') ? line.split(':')[0].trim() : '';
+
+          // Boşlukları doldur
+          const parts = content.split(/(\[\d+\])/);
+          
+          return (
+            <div key={idx} className={`flex flex-col ${isA ? 'items-start' : 'items-end'} animate-slide-in`}>
+              {speaker && <span className="text-[10px] font-bold text-slate-500 uppercase mb-1 ml-2 mr-2">{speaker}</span>}
+              <div className={`px-4 py-3 rounded-2xl text-lg font-medium shadow-md transition-all duration-500 ${isA ? 'bg-indigo-600/20 border-l-4 border-indigo-500 rounded-tl-none' : 'bg-slate-800 border-r-4 border-slate-600 rounded-tr-none text-right'}`}>
+                {parts.map((part, pIdx) => {
+                  const match = part.match(/\[(\d+)\]/);
+                  if (match) {
+                    const blankIdx = parseInt(match[1]) - 1;
+                    const filledWord = answers[blankIdx];
+                    return (
+                      <span key={pIdx} className={`inline-block min-w-[60px] mx-1 border-b-2 transition-all ${filledWord ? 'text-indigo-400 border-indigo-400 animate-bounce' : 'text-slate-600 border-slate-600 border-dashed'}`}>
+                        {filledWord || `(${blankIdx + 1})`}
+                      </span>
+                    );
+                  }
+                  return <span key={pIdx}>{part}</span>;
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   if (state.gameStatus === 'setup') {
@@ -344,9 +380,7 @@ const App: React.FC = () => {
   if (state.gameStatus === 'map') {
     return (
       <div className="h-screen bg-[#020617] relative overflow-hidden">
-        {/* Deep Space Background Layer */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          {/* Nebulas */}
           {spaceBackground.nebulas.map((n, i) => (
             <div 
               key={i}
@@ -360,7 +394,6 @@ const App: React.FC = () => {
               }}
             />
           ))}
-          {/* Twinkling Stars */}
           {spaceBackground.stars.map(star => (
             <div 
               key={star.id}
@@ -376,9 +409,6 @@ const App: React.FC = () => {
               }}
             />
           ))}
-          {/* Shooting Stars */}
-          <div className="shooting-star" style={{ top: '10%', right: '5%', animation: 'shooting-star 8s infinite 2s' }} />
-          <div className="shooting-star" style={{ top: '40%', right: '15%', animation: 'shooting-star 12s infinite 5s' }} />
         </div>
 
         <div className="absolute top-6 left-6 z-20 flex gap-4">
@@ -458,46 +488,77 @@ const App: React.FC = () => {
     const topic = LEVEL_INFO[state.targetLanguage]?.[state.currentMapLevel];
     const nativeTitle = topic?.title[state.currentLanguage] || topic?.title['en'] || t('level') + " " + state.currentMapLevel;
     const nativeExplanation = topic?.explanation[state.currentLanguage] || topic?.explanation['en'];
-    const isDense = (topic?.examples?.length || 0) > 6;
+    
+    // Diyalog içeren örnekleri ayır
+    const dialogueEx = topic?.examples.find(ex => ex.label['en'].toLowerCase().includes('dialog'));
+    const otherExamples = topic?.examples.filter(ex => !ex.label['en'].toLowerCase().includes('dialog')) || [];
+    const isDense = otherExamples.length > 6;
 
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-white overflow-y-auto no-scrollbar">
-        <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 p-8 rounded-[2rem] shadow-2xl question-entrance my-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-indigo-600/20 rounded-xl flex items-center justify-center text-2xl shadow-inner">📖</div>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center p-4 sm:p-10 text-white overflow-y-auto no-scrollbar">
+        <div className="max-w-3xl w-full bg-slate-900 border border-slate-800 p-6 sm:p-10 rounded-[2.5rem] shadow-2xl question-entrance my-4 sm:my-8 flex flex-col gap-8">
+          
+          {/* Header */}
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-indigo-600/30 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-indigo-500/20">📖</div>
             <div>
-              <p className="text-indigo-400 font-bold uppercase tracking-widest text-[10px]">{t('lessonTitle')}</p>
-              <h1 className="text-2xl font-black leading-tight no-uppercase">{nativeTitle}</h1>
+              <p className="text-indigo-400 font-bold uppercase tracking-widest text-[11px] mb-1">{t('lessonTitle')}</p>
+              <h1 className="text-3xl font-black leading-tight no-uppercase">{nativeTitle}</h1>
             </div>
           </div>
-          <div className="space-y-6">
-            {nativeExplanation && (
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-                <p className="text-slate-300 leading-snug text-sm no-uppercase">{nativeExplanation}</p>
-              </div>
-            )}
-            {topic?.examples && topic.examples.length > 0 && (
-              <div className="space-y-3">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Details</p>
-                <div className={`grid gap-2 overflow-y-auto max-h-[40vh] pr-2 no-scrollbar ${isDense ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1'}`}>
-                  {topic.examples.map((ex, i) => (
-                    <div key={i} className="flex flex-col items-center justify-center p-3 bg-slate-800/30 rounded-xl border border-slate-700/30 transition-colors hover:bg-slate-800/50 text-center">
-                      <span className="font-black text-indigo-400 text-lg sm:text-xl no-uppercase leading-tight">
-                        {ex.label[state.currentLanguage] || ex.label['en']}
+
+          {/* Explanation Text */}
+          {nativeExplanation && (
+            <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 shadow-sm">
+              <p className="text-slate-300 leading-relaxed text-base no-uppercase">{nativeExplanation}</p>
+            </div>
+          )}
+          
+          {/* Details / Examples Grid */}
+          {otherExamples.length > 0 && (
+            <div className="flex flex-col gap-4">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">İfadeler ve Detaylar</h3>
+              <div className={`grid gap-3 ${isDense ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1'}`}>
+                {otherExamples.map((ex, i) => (
+                  <div key={i} className="flex flex-col items-start justify-center p-4 bg-slate-800/20 rounded-2xl border border-slate-700/30 transition-all hover:bg-slate-800/40 hover:border-slate-600 shadow-sm">
+                    <div className="flex flex-col w-full">
+                      <span className="font-black text-white text-lg sm:text-xl no-uppercase leading-tight mb-1">
+                        {ex.label[state.targetLanguage]}
                       </span>
-                      <div className="w-4 h-0.5 bg-slate-700 my-1 rounded-full" />
-                      <span className="text-slate-200 text-xs font-bold no-uppercase">{ex.content}</span>
+                      {state.targetLanguage !== state.currentLanguage && (
+                        <span className="text-indigo-400 text-[11px] font-bold no-uppercase opacity-80 mb-2">
+                          {ex.label[state.currentLanguage]}
+                        </span>
+                      )}
                     </div>
-                  ))}
-                </div>
+                    <div className="w-full h-px bg-slate-700/50 my-2" />
+                    <span className="text-slate-400 text-xs font-medium no-uppercase leading-normal">
+                      {ex.content[state.currentLanguage] || ex.content['en']}
+                    </span>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-          <div className="mt-8 flex flex-col gap-3">
-            <button onClick={startActualPlay} className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg shadow-xl shadow-indigo-500/10 transition-all active:scale-95">
+            </div>
+          )}
+
+          {/* Special Dialogue Box */}
+          {dialogueEx && (
+            <div className="flex flex-col gap-4 pt-4 border-t border-slate-800">
+              <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest pl-1">{dialogueEx.label[state.currentLanguage]}</h3>
+              <div className="bg-indigo-950/20 border-2 border-indigo-500/20 p-6 sm:p-8 rounded-[2rem] shadow-inner">
+                <pre className="whitespace-pre-wrap font-['Nunito'] text-base sm:text-lg leading-loose text-indigo-100 no-uppercase tracking-tight">
+                  {dialogueEx.content[state.currentLanguage] || dialogueEx.content['en']}
+                </pre>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-4 mt-4">
+            <button onClick={startActualPlay} className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-black text-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95 transform">
               🚀 {t('startLesson')}
             </button>
-            <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="w-full py-2 text-slate-500 font-bold text-xs hover:text-white transition-colors">
+            <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="w-full py-2 text-slate-500 font-bold text-xs hover:text-white transition-colors uppercase tracking-widest">
               {t('backToMap')}
             </button>
           </div>
@@ -513,14 +574,12 @@ const App: React.FC = () => {
     const uniqueQuestionKey = `q-key-${state.totalAnswersInLevel}-${state.currentWord?.id || state.currentExercise?.id || 'none'}`;
 
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col text-white p-6 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="min-h-screen bg-slate-950 flex flex-col text-white p-4 sm:p-6 relative overflow-hidden">
         <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col pb-24">
-          <div className="flex justify-between items-center mb-12">
+          <div className="flex justify-between items-center mb-8 sm:mb-12">
             <div className="flex-1 pr-8">
               <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-indigo-500 transition-all duration-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]" style={{ width: `${progress}%` }} />
+                <div className="h-full bg-indigo-500 transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
             </div>
             <div className="text-right">
@@ -528,8 +587,9 @@ const App: React.FC = () => {
               <p className="text-xl font-black text-indigo-400">{state.score}</p>
             </div>
           </div>
-          <div key={uniqueQuestionKey} className="flex-1 flex flex-col items-center justify-center -mt-10 space-y-8 question-entrance">
-            <div className="text-center w-full">
+          
+          <div key={uniqueQuestionKey} className="flex-1 flex flex-col items-center justify-center space-y-8 question-entrance">
+            <div className="w-full text-center">
               {isVocab && state.currentWord ? (
                 <div className="space-y-4">
                   <span className="px-4 py-1.5 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded-full uppercase tracking-tighter border border-indigo-500/30">
@@ -540,44 +600,36 @@ const App: React.FC = () => {
                   </h2>
                 </div>
               ) : exercise && (
-                <div className="space-y-6">
-                   <span className="px-4 py-1.5 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full uppercase tracking-tighter border border-blue-500/30">
+                <div className="space-y-6 w-full">
+                  <span className="px-4 py-1.5 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full uppercase tracking-tighter border border-blue-500/30">
                     {exercise.topic}
                   </span>
-                  {exercise.type === 'choice' ? (
-                    <h2 className="text-4xl font-bold no-uppercase text-slate-100 leading-snug">
-                      {exercise.sentence.split('______').map((part, i, arr) => (
-                        <React.Fragment key={i}>
-                          {part}
-                          {i < arr.length - 1 && (
-                            <span className="inline-block min-w-[100px] border-b-4 border-indigo-500 text-indigo-400 mx-2 text-center">
-                              {state.selectedOption || " "}
-                            </span>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </h2>
+                  
+                  {exercise.type === 'dialogue_completion' ? (
+                    renderDialogue(exercise.sentence, state.orderingState || [])
                   ) : (
                     <div className="space-y-6">
                       <h2 className="text-2xl font-bold text-slate-400 uppercase tracking-widest">{t('orderingInstruction')}</h2>
                       <div className="flex flex-wrap justify-center gap-1.5 min-h-[60px] p-4 bg-slate-900/60 border-2 border-dashed border-slate-700 rounded-3xl overflow-y-auto max-h-[160px] no-scrollbar">
                         {(state.orderingState || []).map((char, i) => (
-                          <div key={i} className={`px-2 py-1.5 sm:px-3 sm:py-2 bg-indigo-600 rounded-xl font-black animate-bounce leading-tight text-center ${exercise.options.length > 8 ? 'text-sm sm:text-base' : 'text-base sm:text-lg'}`}>
+                          <div key={i} className={`px-3 py-2 bg-indigo-600 rounded-xl font-black leading-tight text-center text-lg`}>
                             {char}
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
+
                   <div className="mt-4 p-3 bg-slate-900/40 border border-slate-800 rounded-2xl">
-                    <p className="text-slate-400 italic text-md no-uppercase max-w-md mx-auto">{exercise.translations[state.currentLanguage]}</p>
+                    <p className="text-slate-400 italic text-sm no-uppercase max-w-md mx-auto">{exercise.translations[state.currentLanguage]}</p>
                   </div>
                 </div>
               )}
             </div>
-            {exercise?.type === 'ordering' ? (
+
+            {(exercise?.type === 'ordering' || exercise?.type === 'dialogue_completion') ? (
               <div className="w-full space-y-4">
-                <div className={`grid gap-2 w-full ${exercise.options.length > 10 ? 'grid-cols-4 sm:grid-cols-6' : 'grid-cols-3 sm:grid-cols-5'}`}>
+                <div className={`grid gap-2 w-full ${state.options.length > 5 ? 'grid-cols-3' : 'grid-cols-2'}`}>
                   {state.options.map((option, idx) => (
                     <button
                       key={`${uniqueQuestionKey}-opt-${idx}`}
@@ -585,11 +637,11 @@ const App: React.FC = () => {
                       disabled={state.selectedOption !== null || state.orderingState?.includes(option)}
                       className={getOptionClasses(option)}
                     >
-                      {option}
+                      <span className="no-uppercase">{option}</span>
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setState(p => ({ ...p, orderingState: [] }))} disabled={state.selectedOption !== null} className="w-full py-2 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-white transition-colors bg-slate-800/30 rounded-lg border border-slate-700/50">
+                <button onClick={() => setState(p => ({ ...p, orderingState: [] }))} disabled={state.selectedOption !== null} className="w-full py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-white transition-colors bg-slate-800/30 rounded-xl border border-slate-700/50">
                   ↺ {t('clear')}
                 </button>
               </div>
@@ -604,6 +656,7 @@ const App: React.FC = () => {
             )}
           </div>
         </div>
+        
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30">
           <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="px-6 py-3 bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-2xl text-slate-400 hover:text-white transition-all flex items-center gap-2 shadow-2xl active:scale-95">
             🗺️ {t('backToMap')}

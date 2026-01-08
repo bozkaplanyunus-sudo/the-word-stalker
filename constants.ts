@@ -1,7 +1,5 @@
 
-import { Word, Category, Language, GrammarExercise, LevelInfo } from './types';
-
-export const CATEGORIES: Category[] = ['Noun', 'Verb', 'Adjective', 'Adverb'];
+import { Word, Language, GrammarExercise, LevelInfo } from './types';
 
 export const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -99,255 +97,232 @@ export const UI_TRANSLATIONS: Record<Language, Record<string, string>> = {
   }
 };
 
-const createNumExample = (n: number, wordEn: string, wordFr: string, wordTr: string) => ({
-  label: { tr: wordTr, en: wordEn, fr: wordFr },
-  content: { tr: n.toString(), en: n.toString(), fr: n.toString() }
-});
-
-export const VOCAB_LEVEL_INFO: Record<Language, Record<number, { title: Record<Language, string> }>> = {
-  tr: {
-    1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
-    2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
-    3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
-    4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
-  },
-  en: {
-    1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
-    2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
-    3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
-    4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
-  },
-  fr: {
-    1: { title: { tr: "İsimler - I", en: "Nouns - I", fr: "Noms - I" } },
-    2: { title: { tr: "Fiiller - I", en: "Verbs - I", fr: "Verbes - I" } },
-    3: { title: { tr: "Sıfatlar - I", en: "Adjectives - I", fr: "Adjectifs - I" } },
-    4: { title: { tr: "Zarflar - I", en: "Adverbs - I", fr: "Adverbes - I" } },
-  }
-};
-
 export const LEVEL_INFO: Record<Language, Record<number, LevelInfo>> = {
   tr: {
-    1: {
-      title: { tr: "Alfabe", en: "Alphabet", fr: "L'Alphabet" },
-      explanation: { 
-        tr: "Türkçe’de 29 harf bulunmaktadır. Bunlardan 8 tanesi sesli, 21 tanesi sessizdir.",
-        en: "There are 29 letters in the Turkish alphabet. 8 are vowels and 21 are consonants.",
-        fr: "L'alphabet turc comprend 29 lettres. 8 sont des voyelles et 21 sont des consonnes."
-      },
-      examples: [
-        { label: { tr: "A", en: "A", fr: "A" }, content: { tr: "Araba", en: "Car", fr: "Voiture" } },
-        { label: { tr: "B", en: "B", fr: "B" }, content: { tr: "Baba", en: "Father", fr: "Père" } },
-        { label: { tr: "C", en: "C", fr: "C" }, content: { tr: "Ceviz", en: "Walnut", fr: "Noix" } },
-        { label: { tr: "Ç", en: "Ch", fr: "Ch" }, content: { tr: "Çiçek", en: "Flower", fr: "Fleur" } }
-      ]
-    },
-    2: {
-      title: { tr: "Sayılar", en: "Numbers", fr: "Les Nombres" },
-      explanation: {
-        tr: "Türkçe sayılar onluk sisteme dayanır.",
-        en: "Turkish numbers are based on the decimal system.",
-        fr: "Les nombres turcs sont basés sur le système décimal."
-      },
-      examples: [
-        createNumExample(1, "One", "Un", "Bir"), 
-        createNumExample(2, "Two", "Deux", "İki"), 
-        createNumExample(3, "Three", "Trois", "Üç"),
-        createNumExample(10, "Ten", "Dix", "On")
-      ]
-    },
-    3: {
-      title: { tr: "Selamlaşma ve Tanışma", en: "Greetings and Introductions", fr: "Salutations et Présentations" },
-      explanation: {
-        tr: "Selamlaşma ve tanışma, iletişimin ilk adımıdır. Türkçede selamlaşmalar hem resmî hem de samimî olabilir. Duruma, zamana ve karşımızdaki kişiye göre uygun ifadeyi seçeriz.",
-        en: "Greetings and introductions are the first steps. In Turkish, they can be formal or informal. We choose the appropriate expression based on the situation, time, and person.",
-        fr: "Les salutations et les présentations sont les premières étapes. En turc, elles peuvent être formelles ou informelles. Nous choisissons l'expression appropriée en fonction de la situation, du temps et de la personne."
-      },
-      examples: [
-        { 
-          label: { tr: "Merhaba", en: "Hello", fr: "Bonjour" }, 
-          content: { tr: "Günün her saati — genel selam", en: "Any time of day — general greeting", fr: "À tout moment — salutation générale" } 
-        },
-        { 
-          label: { tr: "Günaydın", en: "Good morning", fr: "Bonjour" }, 
-          content: { tr: "Sabah", en: "In the morning", fr: "Le matin" } 
-        },
-        { 
-          label: { tr: "İyi günler", en: "Good day", fr: "Bonne journée" }, 
-          content: { tr: "Gündüz — resmî", en: "Daytime — formal", fr: "Pendant la journée — formel" } 
-        },
-        { 
-          label: { tr: "İyi akşamlar", en: "Good evening", fr: "Bonsoir" }, 
-          content: { tr: "Akşam", en: "Evening", fr: "Le soir" } 
-        },
-        { 
-          label: { tr: "İyi geceler", en: "Good night", fr: "Bonne nuit" }, 
-          content: { tr: "Gece — hem selam hem veda", en: "Night — both greeting and farewell", fr: "Nuit — à la fois salutation et adieu" } 
-        },
-        { 
-          label: { tr: "Selam", en: "Hi", fr: "Salut" }, 
-          content: { tr: "Samimî, arkadaşça", en: "Casual, friendly", fr: "Informel, amical" } 
-        },
-        { 
-          label: { tr: "N'aber?", en: "What's up?", fr: "Quoi de neuf ?" }, 
-          content: { tr: "Samimî ('Ne haber'in kısaltması)", en: "Casual (Short for 'What news')", fr: "Informel (Abréviation de 'Quelles nouvelles')" } 
-        },
-        { 
-          label: { tr: "Teşekkürler", en: "Thanks", fr: "Merci" }, 
-          content: { tr: "Nezaket ifadesi", en: "Expression of gratitude", fr: "Expression de gratitude" } 
-        },
-        { 
-          label: { tr: "Benim adım ...", en: "My name is ...", fr: "Je m'appelle ..." }, 
-          content: { tr: "Kendimizi tanıtırız", en: "Introduce ourselves", fr: "Se présenter" } 
-        },
-        { 
-          label: { tr: "Senin adın ne?", en: "What is your name?", fr: "Comment t'appelles-tu ?" }, 
-          content: { tr: "Samimî soru", en: "Casual question", fr: "Question informelle" } 
-        },
-        { 
-          label: { tr: "Sizin adınız ne?", en: "What is your name? (Formal)", fr: "Comment vous appelez-vous ?" }, 
-          content: { tr: "Resmî soru", en: "Formal question", fr: "Question formelle" } 
-        },
-        { 
-          label: { tr: "Memnun oldum", en: "Nice to meet you", fr: "Enchanté" }, 
-          content: { tr: "Tanışma sonunda söylenir", en: "Said at the end of meeting", fr: "Dit à la fin d'une rencontre" } 
-        },
-        { 
-          label: { tr: "Ben de memnun oldum", en: "Nice to meet you too", fr: "Enchanté aussi" }, 
-          content: { tr: "Karşılık ifadesi", en: "The response", fr: "La réponse" } 
-        },
-        { 
-          label: { tr: "Görüşürüz", en: "See you", fr: "À bientôt" }, 
-          content: { tr: "Veda ifadesi", en: "Farewell expression", fr: "Expression d'adieu" } 
-        },
-        { 
-          label: { tr: "Hoşça kal", en: "Goodbye", fr: "Au revoir" }, 
-          content: { tr: "Kalana söylenir", en: "Said to the one staying", fr: "Dit à celui qui reste" } 
-        },
-        { 
-          label: { tr: "Güle güle", en: "Goodbye", fr: "Au revoir" }, 
-          content: { tr: "Gidene söylenir", en: "Said to the one leaving", fr: "Dit à celui qui part" } 
-        },
-        {
-          label: { tr: "Mini Diyalog", en: "Mini Dialog", fr: "Mini Dialogue" },
-          content: { 
-            tr: "- Merhaba, ben Yunus.\n- Merhaba, ben Ayşe. Memnun oldum.\n- Ben de memnun oldum.\n- Nasılsınız?\n- İyiyim, teşekkür ederim. Siz nasılsınız?\n- Ben de iyiyim, teşekkürler.", 
-            en: "- Hello, I'm Yunus.\n- Hello, I'm Ayşe. Nice to meet you.\n- Nice to meet you too.\n- How are you?\n- I'm fine, thank you. How are you?\n- I'm fine too, thanks.", 
-            fr: "- Bonjour, je suis Yunus.\n- Bonjour, je suis Ayşe. Enchantée.\n- Enchanté aussi.\n- Comment allez-vous ?\n- Je vais bien, merci. Et vous ?\n- Je vais bien aussi, merci." 
-          }
-        }
-      ]
-    }
+    1: { title: { tr: "İsimler I", en: "Nouns I", fr: "Noms I" }, explanation: { tr: "Günlük hayatın temel taşları: En sık kullanılan 50 isim.", en: "Cornerstones of daily life: Top 50 nouns.", fr: "Pierres angulaires de la vie quotidienne : Les 50 noms les plus fréquents." }, examples: [] },
+    2: { title: { tr: "İsimler II", en: "Nouns II", fr: "Noms II" }, explanation: { tr: "Çevremizi tanımlayan daha fazla detay: Diğer 50 isim.", en: "More details describing our surroundings: Next 50 nouns.", fr: "Plus de détails décrivant notre environnement : 50 autres noms." }, examples: [] },
+    3: { title: { tr: "Fiiller I", en: "Verbs I", fr: "Verbes I" }, explanation: { tr: "Harekete geçme zamanı: En temel 50 fiil.", en: "Time to take action: Top 50 verbs.", fr: "Il est temps de passer à l'action : Les 50 verbes les plus essentiels." }, examples: [] },
+    4: { title: { tr: "Fiiller II", en: "Verbs II", fr: "Verbes II" }, explanation: { tr: "Anlatımını zenginleştir: Diğer 50 fiil.", en: "Enrich your expression: Next 50 verbs.", fr: "Enrichissez votre expression : 50 autres verbes." }, examples: [] }
   },
   en: {
-    1: {
-      title: { tr: "Alfabe", en: "Alphabet", fr: "L'Alphabet" },
-      explanation: { tr: "İngiliz alfabesi 26 harften oluşur.", en: "English alphabet has 26 letters.", fr: "L'alphabet anglais a 26 lettres." },
-      examples: [{ label: { tr: "Apple", en: "Apple", fr: "Pomme" }, content: { tr: "Elma", en: "Apple", fr: "Pomme" } }]
-    }
+    1: { title: { tr: "İsimler I", en: "Nouns I", fr: "Noms I" }, explanation: { tr: "Günlük hayatın temel taşları.", en: "Cornerstones of daily life.", fr: "Pierres angulaires de la vie quotidienne." }, examples: [] }
   },
   fr: {
-    1: {
-      title: { tr: "Alfabe", en: "Alphabet", fr: "L'Alphabet" },
-      explanation: { tr: "Fransız alfabesi 26 harften oluşur.", en: "French alphabet has 26 letters.", fr: "L'alphabet français a 26 lettres." },
-      examples: [{ label: { tr: "Avion", en: "Airplane", fr: "Avion" }, content: { tr: "Uçak", en: "Airplane", fr: "Avion" } }]
-    }
+    1: { title: { tr: "İsimler I", en: "Nouns I", fr: "Noms I" }, explanation: { tr: "Günlük hayatın temel taşları.", en: "Cornerstones of daily life.", fr: "Pierres angulaires de la vie quotidienne." }, examples: [] }
   }
 };
 
-export const GRAMMAR_DATABASE: GrammarExercise[] = [
-  // --- TÜRKÇE SEVİYE 3: SELAMLAŞMA VE TANIŞMA (DİYALOG TAMAMLAMA) ---
-  // Kural: 5 Boşluk, 6 Kelime (5 doğru, 1 yanlış)
-  {
-    id: "tr-l3-d1", language: "tr", type: "dialogue_completion",
-    sentence: "Ali: Selam Ayşe, [1]? \nAyşe: [2], sen nasılsın? \nAli: Ben de [3]. [4] oldum. \nAyşe: Ben [5] memnun oldum.",
-    translations: { en: "Greeting and meeting dialog.", tr: "Selamlaşma ve tanışma diyaloğu.", fr: "Dialogue de salutation et de rencontre." },
-    correctAnswer: "nasılsın,İyiyim,iyiyim,Memnun,de", 
-    options: ["nasılsın", "iyiyim", "İyiyim", "Memnun", "de", "Görüşürüz"], 
-    topic: "Tanışma", level: 3
-  },
-  {
-    id: "tr-l3-d2", language: "tr", type: "dialogue_completion",
-    sentence: "Öğrenci: [1] öğretmenim. \nÖğretmen: Günaydın [2], [3]? \nÖğrenci: [4] öğretmenim. \nÖğretmen: [5] nasılsınız?.",
-    translations: { en: "Morning greeting at school.", tr: "Okulda sabah selamlaşması.", fr: "Salutation du matin à l'école." },
-    correctAnswer: "Günaydın,Ahmet,nasılsın,İyiyim,Siz", 
-    options: ["Günaydın", "Ahmet", "nasılsın", "İyiyim", "Siz", "Hayır"], 
-    topic: "Okul", level: 3
-  },
-  {
-    id: "tr-l3-d3", language: "tr", type: "dialogue_completion",
-    sentence: "Can: [1] akşamlar. \nSu: İyi akşamlar, [2] [3]? \nCan: [4], teşekkürler. Siz nasılsınız? \nSu: [5] de iyiyim.",
-    translations: { en: "Evening greeting.", tr: "Akşam selamlaşması.", fr: "Salutation du soir." },
-    correctAnswer: "İyi,nasılsınız,efendim,İyiyim,Ben", 
-    options: ["İyi", "nasılsınız", "efendim", "İyiyim", "Ben", "Kötü"], 
-    topic: "Resmî Selamlaşma", level: 3
-  },
-  {
-    id: "tr-l3-d4", language: "tr", type: "dialogue_completion",
-    sentence: "A: Selam, [1]? \nB: İyilik, [2] n'aber? \nA: Benden de [3]. Tanıştığımıza [4] oldum.",
-    translations: { en: "Informal greeting.", tr: "Samimî selamlaşma.", fr: "Salutation informelle." },
-    correctAnswer: "n'aber,senden,iyilik,memnun", 
-    options: ["n'aber", "senden", "iyilik", "memnun", "Selam"], 
-    topic: "Samimî", level: 3
-  },
-  {
-    id: "tr-l3-d5", language: "tr", type: "dialogue_completion",
-    sentence: "Anne: [1] geceler tatlım. \nBebek: İyi [2] anne. \nAnne: [3] uykular. \nBebek: [4] da iyi [5].",
-    translations: { en: "Bedtime dialog.", tr: "Uyku vakti diyaloğu.", fr: "Dialogue du coucher." },
-    correctAnswer: "İyi,geceler,Tatlı,Sana,uykular", 
-    options: ["İyi", "geceler", "Tatlı", "Sana", "uykular", "Sabah"], 
-    topic: "Gece", level: 3
-  },
-  {
-    id: "tr-l3-d6", language: "tr", type: "dialogue_completion",
-    sentence: "Okul Müdürü: [1] günler, hoş geldiniz. \nMüşteri: [2] buldum. \nOkul Müdürü: [3] [4] ne? \nMüşteri: [5] adım John.",
-    translations: { en: "At a restaurant.", tr: "Restoranda selamlaşma.", fr: "Au restaurant." },
-    correctAnswer: "İyi,Hoş,Sizin,adınız,Benim", 
-    options: ["İyi", "Hoş", "Sizin", "adınız", "Benim", "Yemek"], 
-    topic: "Resmî", level: 3
-  },
-  {
-    id: "tr-l3-d7", language: "tr", type: "dialogue_completion",
-    sentence: "A: Merhaba, [1]? \nB: Merhaba, [2]. Senin [3] ne? \nA: [4] [5] Elif.",
-    translations: { en: "Basic meeting.", tr: "Temel tanışma.", fr: "Rencontre de base." },
-    correctAnswer: "nasılsın,iyiyim,adın,Benim,adım", 
-    options: ["nasılsın", "adım", "iyiyim", "adın", "Benim", "Televizyon"], 
-    topic: "Tanışma", level: 3
-  },
-  {
-    id: "tr-l3-d8", language: "tr", type: "dialogue_completion",
-    sentence: "Müdür: [1] günler, [2] Bey. \nPersonel: İyi [3], Ahmet Bey. \nMüdür: Tanıştığımıza [4] oldum. \nPersonel: [5] de.",
-    translations: { en: "Office greeting.", tr: "Ofis selamlaşması.", fr: "Salutation au bureau." },
-    correctAnswer: "İyi,Hakan,günler,memnun,Ben", 
-    options: ["İyi", "Hakan", "günler", "memnun", "Ben", "Çay"], 
-    topic: "İş Dünyası", level: 3
-  },
-  {
-    id: "tr-l3-d9", language: "tr", type: "dialogue_completion",
-    sentence: "Ece: [1] kal Ayşe. \nAyşe: [2] [3] git Ece. \nEce: Yarın [4]. \nAyşe: [5] üzere.",
-    translations: { en: "Saying goodbye.", tr: "Vedalaşma diyaloğu.", fr: "Dire au revoir." },
-    correctAnswer: "Hoşça,Güle,güle,görüşürüz,Görüşmek", 
-    options: ["Hoşça", "Güle", "güle", "görüşürüz", "Görüşmek", "Selam"], 
-    topic: "Veda", level: 3
-  },
-  {
-    id: "tr-l3-d10", language: "tr", type: "dialogue_completion",
-    sentence: "Yolcu: [1] [2] efendim. \nŞoför: Teşekkürler, [3] de. \nYolcu: [4] [5] ne?",
-    translations: { en: "Taxi driver dialog.", tr: "Taksi şoförü ile diyalog.", fr: "Dialogue avec un chauffeur de taxi." },
-    correctAnswer: "İyi,günler,size,Sizin,adınız", 
-    options: ["İyi", "günler", "size", "Sizin", "adınız", "Nereye"], 
-    topic: "Ulaşım", level: 3
-  }
+// 200 Kelimelik Veri Kütüphanesi
+export const WORD_DATABASE: Word[] = [
+  // PLANET 1: Nouns I (1-50)
+  { id: 'n1', tr: 'su', en: 'water', fr: 'eau', type: 'noun', planetId: 1 },
+  { id: 'n2', tr: 'yemek', en: 'food', fr: 'nourriture', type: 'noun', planetId: 1 },
+  { id: 'n3', tr: 'ev', en: 'house', fr: 'maison', type: 'noun', planetId: 1 },
+  { id: 'n4', tr: 'aile', en: 'family', fr: 'famille', type: 'noun', planetId: 1 },
+  { id: 'n5', tr: 'güneş', en: 'sun', fr: 'soleil', type: 'noun', planetId: 1 },
+  { id: 'n6', tr: 'ay', en: 'moon', fr: 'lune', type: 'noun', planetId: 1 },
+  { id: 'n7', tr: 'ağaç', en: 'tree', fr: 'arbre', type: 'noun', planetId: 1 },
+  { id: 'n8', tr: 'kitap', en: 'book', fr: 'livre', type: 'noun', planetId: 1 },
+  { id: 'n9', tr: 'kalem', en: 'pen', fr: 'stylo', type: 'noun', planetId: 1 },
+  { id: 'n10', tr: 'okul', en: 'school', fr: 'école', type: 'noun', planetId: 1 },
+  { id: 'n11', tr: 'öğrenci', en: 'student', fr: 'étudiant', type: 'noun', planetId: 1 },
+  { id: 'n12', tr: 'öğretmen', en: 'teacher', fr: 'professeur', type: 'noun', planetId: 1 },
+  { id: 'n13', tr: 'arkadaş', en: 'friend', fr: 'ami', type: 'noun', planetId: 1 },
+  { id: 'n14', tr: 'aşk', en: 'love', fr: 'amour', type: 'noun', planetId: 1 },
+  { id: 'n15', tr: 'hayat', en: 'life', fr: 'vie', type: 'noun', planetId: 1 },
+  { id: 'n16', tr: 'zaman', en: 'time', fr: 'temps', type: 'noun', planetId: 1 },
+  { id: 'n17', tr: 'gün', en: 'day', fr: 'jour', type: 'noun', planetId: 1 },
+  { id: 'n18', tr: 'gece', en: 'night', fr: 'nuit', type: 'noun', planetId: 1 },
+  { id: 'n19', tr: 'sabah', en: 'morning', fr: 'matin', type: 'noun', planetId: 1 },
+  { id: 'n20', tr: 'akşam', en: 'evening', fr: 'soir', type: 'noun', planetId: 1 },
+  { id: 'n21', tr: 'ekmek', en: 'bread', fr: 'pain', type: 'noun', planetId: 1 },
+  { id: 'n22', tr: 'süt', en: 'milk', fr: 'lait', type: 'noun', planetId: 1 },
+  { id: 'n23', tr: 'yumurta', en: 'egg', fr: 'oeuf', type: 'noun', planetId: 1 },
+  { id: 'n24', tr: 'meyve', en: 'fruit', fr: 'fruit', type: 'noun', planetId: 1 },
+  { id: 'n25', tr: 'sebze', en: 'vegetable', fr: 'légume', type: 'noun', planetId: 1 },
+  { id: 'n26', tr: 'et', en: 'meat', fr: 'viande', type: 'noun', planetId: 1 },
+  { id: 'n27', tr: 'balık', en: 'fish', fr: 'poisson', type: 'noun', planetId: 1 },
+  { id: 'n28', tr: 'şehir', en: 'city', fr: 'ville', type: 'noun', planetId: 1 },
+  { id: 'n29', tr: 'ülke', en: 'country', fr: 'pays', type: 'noun', planetId: 1 },
+  { id: 'n30', tr: 'sokak', en: 'street', fr: 'rue', type: 'noun', planetId: 1 },
+  { id: 'n31', tr: 'yol', en: 'road', fr: 'route', type: 'noun', planetId: 1 },
+  { id: 'n32', tr: 'araba', en: 'car', fr: 'voiture', type: 'noun', planetId: 1 },
+  { id: 'n33', tr: 'otobüs', en: 'bus', fr: 'bus', type: 'noun', planetId: 1 },
+  { id: 'n34', tr: 'tren', en: 'train', fr: 'train', type: 'noun', planetId: 1 },
+  { id: 'n35', tr: 'uçak', en: 'airplane', fr: 'avion', type: 'noun', planetId: 1 },
+  { id: 'n36', tr: 'gemi', en: 'ship', fr: 'bateau', type: 'noun', planetId: 1 },
+  { id: 'n37', tr: 'hayvan', en: 'animal', fr: 'animal', type: 'noun', planetId: 1 },
+  { id: 'n38', tr: 'kedi', en: 'cat', fr: 'chat', type: 'noun', planetId: 1 },
+  { id: 'n39', tr: 'köpek', en: 'dog', fr: 'chien', type: 'noun', planetId: 1 },
+  { id: 'n40', tr: 'kuş', en: 'bird', fr: 'oiseau', type: 'noun', planetId: 1 },
+  { id: 'n41', tr: 'çiçek', en: 'flower', fr: 'fleur', type: 'noun', planetId: 1 },
+  { id: 'n42', tr: 'gökyüzü', en: 'sky', fr: 'ciel', type: 'noun', planetId: 1 },
+  { id: 'n43', tr: 'dünya', en: 'world', fr: 'monde', type: 'noun', planetId: 1 },
+  { id: 'n44', tr: 'dağ', en: 'mountain', fr: 'montagne', type: 'noun', planetId: 1 },
+  { id: 'n45', tr: 'deniz', en: 'sea', fr: 'mer', type: 'noun', planetId: 1 },
+  { id: 'n46', tr: 'göl', en: 'lake', fr: 'lac', type: 'noun', planetId: 1 },
+  { id: 'n47', tr: 'nehir', en: 'river', fr: 'rivière', type: 'noun', planetId: 1 },
+  { id: 'n48', tr: 'yağmur', en: 'rain', fr: 'pluie', type: 'noun', planetId: 1 },
+  { id: 'n49', tr: 'kar', en: 'snow', fr: 'neige', type: 'noun', planetId: 1 },
+  { id: 'n50', tr: 'rüzgar', en: 'wind', fr: 'vent', type: 'noun', planetId: 1 },
+
+  // PLANET 2: Nouns II (51-100)
+  { id: 'n51', tr: 'pencere', en: 'window', fr: 'fenêtre', type: 'noun', planetId: 2 },
+  { id: 'n52', tr: 'kapı', en: 'door', fr: 'porte', type: 'noun', planetId: 2 },
+  { id: 'n53', tr: 'masa', en: 'table', fr: 'table', type: 'noun', planetId: 2 },
+  { id: 'n54', tr: 'sandalye', en: 'chair', fr: 'chaise', type: 'noun', planetId: 2 },
+  { id: 'n55', tr: 'yatak', en: 'bed', fr: 'lit', type: 'noun', planetId: 2 },
+  { id: 'n56', tr: 'telefon', en: 'phone', fr: 'téléphone', type: 'noun', planetId: 2 },
+  { id: 'n57', tr: 'bilgisayar', en: 'computer', fr: 'ordinateur', type: 'noun', planetId: 2 },
+  { id: 'n58', tr: 'televizyon', en: 'television', fr: 'télévision', type: 'noun', planetId: 2 },
+  { id: 'n59', tr: 'müzik', en: 'music', fr: 'musique', type: 'noun', planetId: 2 },
+  { id: 'n60', tr: 'sinema', en: 'cinema', fr: 'cinéma', type: 'noun', planetId: 2 },
+  { id: 'n61', tr: 'spor', en: 'sport', fr: 'sport', type: 'noun', planetId: 2 },
+  { id: 'n62', tr: 'oyun', en: 'game', fr: 'jeu', type: 'noun', planetId: 2 },
+  { id: 'n63', tr: 'para', en: 'money', fr: 'argent', type: 'noun', planetId: 2 },
+  { id: 'n64', tr: 'iş', en: 'job', fr: 'travail', type: 'noun', planetId: 2 },
+  { id: 'n65', tr: 'sanat', en: 'art', fr: 'art', type: 'noun', planetId: 2 },
+  { id: 'n66', tr: 'bilim', en: 'science', fr: 'science', type: 'noun', planetId: 2 },
+  { id: 'n67', tr: 'tarih', en: 'history', fr: 'histoire', type: 'noun', planetId: 2 },
+  { id: 'n68', tr: 'dil', en: 'language', fr: 'langue', type: 'noun', planetId: 2 },
+  { id: 'n69', tr: 'kültür', en: 'culture', fr: 'culture', type: 'noun', planetId: 2 },
+  { id: 'n70', tr: 'evren', en: 'universe', fr: 'univers', type: 'noun', planetId: 2 },
+  { id: 'n71', tr: 'uzay', en: 'space', fr: 'espace', type: 'noun', planetId: 2 },
+  { id: 'n72', tr: 'yıldız', en: 'star', fr: 'étoile', type: 'noun', planetId: 2 },
+  { id: 'n73', tr: 'ateş', en: 'fire', fr: 'feu', type: 'noun', planetId: 2 },
+  { id: 'n74', tr: 'bulut', en: 'cloud', fr: 'nuage', type: 'noun', planetId: 2 },
+  { id: 'n75', tr: 'duvar', en: 'wall', fr: 'mur', type: 'noun', planetId: 2 },
+  { id: 'n76', tr: 'yer', en: 'floor', fr: 'sol', type: 'noun', planetId: 2 },
+  { id: 'n77', tr: 'çatı', en: 'roof', fr: 'toit', type: 'noun', planetId: 2 },
+  { id: 'n78', tr: 'bahçe', en: 'garden', fr: 'jardin', type: 'noun', planetId: 2 },
+  { id: 'n79', tr: 'ayna', en: 'mirror', fr: 'miroir', type: 'noun', planetId: 2 },
+  { id: 'n80', tr: 'bardak', en: 'glass', fr: 'verre', type: 'noun', planetId: 2 },
+  { id: 'n81', tr: 'anahtar', en: 'key', fr: 'clé', type: 'noun', planetId: 2 },
+  { id: 'n82', tr: 'çanta', en: 'bag', fr: 'sac', type: 'noun', planetId: 2 },
+  { id: 'n83', tr: 'ayakkabı', en: 'shoe', fr: 'chaussure', type: 'noun', planetId: 2 },
+  { id: 'n84', tr: 'gömlek', en: 'shirt', fr: 'chemise', type: 'noun', planetId: 2 },
+  { id: 'n85', tr: 'pantolon', en: 'pants', fr: 'pantalon', type: 'noun', planetId: 2 },
+  { id: 'n86', tr: 'şapka', en: 'hat', fr: 'chapeau', type: 'noun', planetId: 2 },
+  { id: 'n87', tr: 'saat', en: 'watch', fr: 'montre', type: 'noun', planetId: 2 },
+  { id: 'n88', tr: 'kalp', en: 'heart', fr: 'coeur', type: 'noun', planetId: 2 },
+  { id: 'n89', tr: 'vücut', en: 'body', fr: 'corps', type: 'noun', planetId: 2 },
+  { id: 'n90', tr: 'zihin', en: 'mind', fr: 'esprit', type: 'noun', planetId: 2 },
+  { id: 'n91', tr: 'ruh', en: 'soul', fr: 'âme', type: 'noun', planetId: 2 },
+  { id: 'n92', tr: 'fikir', en: 'idea', fr: 'idée', type: 'noun', planetId: 2 },
+  { id: 'n93', tr: 'düşünce', en: 'thought', fr: 'pensée', type: 'noun', planetId: 2 },
+  { id: 'n94', tr: 'rüya', en: 'dream', fr: 'rêve', type: 'noun', planetId: 2 },
+  { id: 'n95', tr: 'hafıza', en: 'memory', fr: 'mémoire', type: 'noun', planetId: 2 },
+  { id: 'n96', tr: 'sorun', en: 'problem', fr: 'problème', type: 'noun', planetId: 2 },
+  { id: 'n97', tr: 'cevap', en: 'answer', fr: 'réponse', type: 'noun', planetId: 2 },
+  { id: 'n98', tr: 'hediye', en: 'gift', fr: 'cadeau', type: 'noun', planetId: 2 },
+  { id: 'n99', tr: 'gezi', en: 'trip', fr: 'voyage', type: 'noun', planetId: 2 },
+  { id: 'n100', tr: 'sabun', en: 'soap', fr: 'savon', type: 'noun', planetId: 2 },
+
+  // PLANET 3: Verbs I (1-50)
+  { id: 'v1', tr: 'olmak', en: 'to be', fr: 'être', type: 'verb', planetId: 3 },
+  { id: 'v2', tr: 'sahip olmak', en: 'to have', fr: 'avoir', type: 'verb', planetId: 3 },
+  { id: 'v3', tr: 'yapmak', en: 'to do', fr: 'faire', type: 'verb', planetId: 3 },
+  { id: 'v4', tr: 'söylemek', en: 'to say', fr: 'dire', type: 'verb', planetId: 3 },
+  { id: 'v5', tr: 'gitmek', en: 'to go', fr: 'aller', type: 'verb', planetId: 3 },
+  { id: 'v6', tr: 'almak', en: 'to get', fr: 'obtenir', type: 'verb', planetId: 3 },
+  { id: 'v7', tr: 'hazırlamak', en: 'to make', fr: 'préparer', type: 'verb', planetId: 3 },
+  { id: 'v8', tr: 'bilmek', en: 'to know', fr: 'savoir', type: 'verb', planetId: 3 },
+  { id: 'v9', tr: 'düşünmek', en: 'to think', fr: 'penser', type: 'verb', planetId: 3 },
+  { id: 'v10', tr: 'götürmek', en: 'to take', fr: 'prendre', type: 'verb', planetId: 3 },
+  { id: 'v11', tr: 'görmek', en: 'to see', fr: 'voir', type: 'verb', planetId: 3 },
+  { id: 'v12', tr: 'gelmek', en: 'to come', fr: 'venir', type: 'verb', planetId: 3 },
+  { id: 'v13', tr: 'istemek', en: 'to want', fr: 'vouloir', type: 'verb', planetId: 3 },
+  { id: 'v14', tr: 'kullanmak', en: 'to use', fr: 'utiliser', type: 'verb', planetId: 3 },
+  { id: 'v15', tr: 'bulmak', en: 'to find', fr: 'trouver', type: 'verb', planetId: 3 },
+  { id: 'v16', tr: 'vermek', en: 'to give', fr: 'donner', type: 'verb', planetId: 3 },
+  { id: 'v17', tr: 'anlatmak', en: 'to tell', fr: 'raconter', type: 'verb', planetId: 3 },
+  { id: 'v18', tr: 'çalışmak', en: 'to work', fr: 'travailler', type: 'verb', planetId: 3 },
+  { id: 'v19', tr: 'çağırmak', en: 'to call', fr: 'appeler', type: 'verb', planetId: 3 },
+  { id: 'v20', tr: 'denemek', en: 'to try', fr: 'essayer', type: 'verb', planetId: 3 },
+  { id: 'v21', tr: 'sormak', en: 'to ask', fr: 'demander', type: 'verb', planetId: 3 },
+  { id: 'v22', tr: 'ihtiyaç duymak', en: 'to need', fr: 'avoir besoin de', type: 'verb', planetId: 3 },
+  { id: 'v23', tr: 'hissetmek', en: 'to feel', fr: 'sentir', type: 'verb', planetId: 3 },
+  { id: 'v24', tr: 'dönüşmek', en: 'to become', fr: 'devenir', type: 'verb', planetId: 3 },
+  { id: 'v25', tr: 'ayrılmak', en: 'to leave', fr: 'partir', type: 'verb', planetId: 3 },
+  { id: 'v26', tr: 'koymak', en: 'to put', fr: 'mettre', type: 'verb', planetId: 3 },
+  { id: 'v27', tr: 'anlamına gelmek', en: 'to mean', fr: 'signifier', type: 'verb', planetId: 3 },
+  { id: 'v28', tr: 'tutmak', en: 'to keep', fr: 'garder', type: 'verb', planetId: 3 },
+  { id: 'v29', tr: 'izin vermek', en: 'to let', fr: 'laisser', type: 'verb', planetId: 3 },
+  { id: 'v30', tr: 'başlamak', en: 'to begin', fr: 'commencer', type: 'verb', planetId: 3 },
+  { id: 'v31', tr: 'görünmek', en: 'to seem', fr: 'sembler', type: 'verb', planetId: 3 },
+  { id: 'v32', tr: 'yardım etmek', en: 'to help', fr: 'aider', type: 'verb', planetId: 3 },
+  { id: 'v33', tr: 'konuşmak', en: 'to talk', fr: 'parler', type: 'verb', planetId: 3 },
+  { id: 'v34', tr: 'dönmek', en: 'to turn', fr: 'tourner', type: 'verb', planetId: 3 },
+  { id: 'v35', tr: 'başlatmak', en: 'to start', fr: 'démarrer', type: 'verb', planetId: 3 },
+  { id: 'v36', tr: 'göstermek', en: 'to show', fr: 'montrer', type: 'verb', planetId: 3 },
+  { id: 'v37', tr: 'duymak', en: 'to hear', fr: 'entendre', type: 'verb', planetId: 3 },
+  { id: 'v38', tr: 'oynamak', en: 'to play', fr: 'jouer', type: 'verb', planetId: 3 },
+  { id: 'v39', tr: 'koşmak', en: 'to run', fr: 'courir', type: 'verb', planetId: 3 },
+  { id: 'v40', tr: 'hareket etmek', en: 'to move', fr: 'bouger', type: 'verb', planetId: 3 },
+  { id: 'v41', tr: 'yaşamak', en: 'to live', fr: 'vivre', type: 'verb', planetId: 3 },
+  { id: 'v42', tr: 'inanmak', en: 'to believe', fr: 'croire', type: 'verb', planetId: 3 },
+  { id: 'v43', tr: 'getirmek', en: 'to bring', fr: 'apporter', type: 'verb', planetId: 3 },
+  { id: 'v44', tr: 'olmak (olay)', en: 'to happen', fr: 'se passer', type: 'verb', planetId: 3 },
+  { id: 'v45', tr: 'yazmak', en: 'to write', fr: 'écrire', type: 'verb', planetId: 3 },
+  { id: 'v46', tr: 'oturmak', en: 'to sit', fr: 's’asseoir', type: 'verb', planetId: 3 },
+  { id: 'v47', tr: 'ayakta durmak', en: 'to stand', fr: 'être debout', type: 'verb', planetId: 3 },
+  { id: 'v48', tr: 'kaybetmek', en: 'to lose', fr: 'perdre', type: 'verb', planetId: 3 },
+  { id: 'v49', tr: 'ödemek', en: 'to pay', fr: 'payer', type: 'verb', planetId: 3 },
+  { id: 'v50', tr: 'buluşmak', en: 'to meet', fr: 'rencontrer', type: 'verb', planetId: 3 },
+
+  // PLANET 4: Verbs II (51-100)
+  { id: 'v51', tr: 'içermek', en: 'to include', fr: 'inclure', type: 'verb', planetId: 4 },
+  { id: 'v52', tr: 'devam etmek', en: 'to continue', fr: 'continuer', type: 'verb', planetId: 4 },
+  { id: 'v53', tr: 'kurmak', en: 'to set', fr: 'régler', type: 'verb', planetId: 4 },
+  { id: 'v54', tr: 'öğrenmek', en: 'to learn', fr: 'apprendre', type: 'verb', planetId: 4 },
+  { id: 'v55', tr: 'değişmek', en: 'to change', fr: 'changer', type: 'verb', planetId: 4 },
+  { id: 'v56', tr: 'yönetmek', en: 'to lead', fr: 'mener', type: 'verb', planetId: 4 },
+  { id: 'v57', tr: 'anlamak', en: 'to understand', fr: 'comprendre', type: 'verb', planetId: 4 },
+  { id: 'v58', tr: 'izlemek', en: 'to watch', fr: 'regarder', type: 'verb', planetId: 4 },
+  { id: 'v59', tr: 'takip etmek', en: 'to follow', fr: 'suivre', type: 'verb', planetId: 4 },
+  { id: 'v60', tr: 'durmak', en: 'to stop', fr: 's’arrêter', type: 'verb', planetId: 4 },
+  { id: 'v61', tr: 'yaratmak', en: 'to create', fr: 'créer', type: 'verb', planetId: 4 },
+  { id: 'v62', tr: 'konuşmak (resmi)', en: 'to speak', fr: 'parler', type: 'verb', planetId: 4 },
+  { id: 'v63', tr: 'okumak', en: 'to read', fr: 'lire', type: 'verb', planetId: 4 },
+  { id: 'v64', tr: 'imkan vermek', en: 'to allow', fr: 'permettre', type: 'verb', planetId: 4 },
+  { id: 'v65', tr: 'eklemek', en: 'to add', fr: 'ajouter', type: 'verb', planetId: 4 },
+  { id: 'v66', tr: 'harcamak', en: 'to spend', fr: 'dépenser', type: 'verb', planetId: 4 },
+  { id: 'v67', tr: 'büyümek', en: 'to grow', fr: 'grandir', type: 'verb', planetId: 4 },
+  { id: 'v68', tr: 'açmak', en: 'to open', fr: 'ouvrir', type: 'verb', planetId: 4 },
+  { id: 'v69', tr: 'yürümek', en: 'to walk', fr: 'marcher', type: 'verb', planetId: 4 },
+  { id: 'v70', tr: 'kazanmak', en: 'to win', fr: 'gagner', type: 'verb', planetId: 4 },
+  { id: 'v71', tr: 'teklif etmek', en: 'to offer', fr: 'offrir', type: 'verb', planetId: 4 },
+  { id: 'v72', tr: 'hatırlamak', en: 'to remember', fr: 'se souvenir', type: 'verb', planetId: 4 },
+  { id: 'v73', tr: 'sevmek', en: 'to love', fr: 'aimer', type: 'verb', planetId: 4 },
+  { id: 'v74', tr: 'değerlendirmek', en: 'to consider', fr: 'considérer', type: 'verb', planetId: 4 },
+  { id: 'v75', tr: 'görünmek (belirmek)', en: 'to appear', fr: 'apparaître', type: 'verb', planetId: 4 },
+  { id: 'v76', tr: 'satın almak', en: 'to buy', fr: 'acheter', type: 'verb', planetId: 4 },
+  { id: 'v77', tr: 'beklemek', en: 'to wait', fr: 'attendre', type: 'verb', planetId: 4 },
+  { id: 'v78', tr: 'servis etmek', en: 'to serve', fr: 'servir', type: 'verb', planetId: 4 },
+  { id: 'v79', tr: 'ölmek', en: 'to die', fr: 'mourir', type: 'verb', planetId: 4 },
+  { id: 'v80', tr: 'göndermek', en: 'to send', fr: 'envoyer', type: 'verb', planetId: 4 },
+  { id: 'v81', tr: 'inşa etmek', en: 'to build', fr: 'construire', type: 'verb', planetId: 4 },
+  { id: 'v82', tr: 'kalmak', en: 'to stay', fr: 'rester', type: 'verb', planetId: 4 },
+  { id: 'v83', tr: 'düşmek', en: 'to fall', fr: 'tomber', type: 'verb', planetId: 4 },
+  { id: 'v84', tr: 'kesmek', en: 'to cut', fr: 'couper', type: 'verb', planetId: 4 },
+  { id: 'v85', tr: 'ulaşmak', en: 'to reach', fr: 'atteindre', type: 'verb', planetId: 4 },
+  { id: 'v86', tr: 'öldürmek', en: 'to kill', fr: 'tuer', type: 'verb', planetId: 4 },
+  { id: 'v87', tr: 'kalmak (artmak)', en: 'to remain', fr: 'rester', type: 'verb', planetId: 4 },
+  { id: 'v88', tr: 'önermek', en: 'to suggest', fr: 'suggérer', type: 'verb', planetId: 4 },
+  { id: 'v89', tr: 'yükseltmek', en: 'to raise', fr: 'augmenter', type: 'verb', planetId: 4 },
+  { id: 'v90', tr: 'geçmek', en: 'to pass', fr: 'passer', type: 'verb', planetId: 4 },
+  { id: 'v91', tr: 'satmak', en: 'to sell', fr: 'vendre', type: 'verb', planetId: 4 },
+  { id: 'v92', tr: 'gerektirmek', en: 'to require', fr: 'nécessiter', type: 'verb', planetId: 4 },
+  { id: 'v93', tr: 'rapor etmek', en: 'to report', fr: 'rapporter', type: 'verb', planetId: 4 },
+  { id: 'v94', tr: 'karar vermek', en: 'to decide', fr: 'décider', type: 'verb', planetId: 4 },
+  { id: 'v95', tr: 'çekmek', en: 'to pull', fr: 'tirer', type: 'verb', planetId: 4 },
+  { id: 'v96', tr: 'itmek', en: 'to push', fr: 'pousser', type: 'verb', planetId: 4 },
+  { id: 'v97', tr: 'taşımak', en: 'to carry', fr: 'porter', type: 'verb', planetId: 4 },
+  { id: 'v98', tr: 'kırmak', en: 'to break', fr: 'casser', type: 'verb', planetId: 4 },
+  { id: 'v99', tr: 'açıklamak', en: 'to explain', fr: 'expliquer', type: 'verb', planetId: 4 },
+  { id: 'v100', tr: 'umut etmek', en: 'to hope', fr: 'espérer', type: 'verb', planetId: 4 }
 ];
 
-const createLevelWords = (level: number, words: [string, string, string, Category][]): Word[] => {
-  return words.map((w, i) => ({
-    id: `l${level}-${i}`,
-    en: w[0], fr: w[1], tr: w[2], category: w[3], rarity: level
-  }))
-};
-
-export const WORD_DATABASE: Word[] = [
-  ...createLevelWords(1, [['Time', 'Temps', 'Zaman', 'Noun'], ['Day', 'Jour', 'Gün', 'Noun'], ['Night', 'Nuit', 'Gece', 'Noun']]),
-  ...createLevelWords(2, [['To go', 'Aller', 'Gitmek', 'Verb'], ['To come', 'Venir', 'Gelmek', 'Verb']]),
-  ...createLevelWords(3, [['Good', 'Bon', 'İyi', 'Adjective'], ['Bad', 'Mauvais', 'Kötü', 'Adjective']]),
+export const GRAMMAR_DATABASE: GrammarExercise[] = [
+  // ... Mevcut gramer verileri buraya gelebilir ...
 ];

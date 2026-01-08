@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     body {
       font-family: 'Nunito', sans-serif;
@@ -36,6 +37,27 @@
         filter: blur(0);
       }
     }
+
+    /* Ortak Titreme Animasyonu (Shake) */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out both;
+      display: inline-block;
+    }
+
+    .text-correct {
+      color: #10b981 !important; /* emerald-500 */
+    }
+    .text-incorrect {
+      color: #ef4444 !important; /* red-500 */
+    }
+
     .no-uppercase {
       text-transform: none !important;
     }
@@ -60,24 +82,6 @@
     }
     .star-twinkle {
       animation: twinkle var(--duration) infinite ease-in-out;
-    }
-
-    @keyframes shooting-star {
-      0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 0; }
-      10% { opacity: 1; }
-      20% { transform: translateX(-1000px) translateY(1000px) rotate(-45deg); opacity: 0; }
-      100% { transform: translateX(-1000px) translateY(1000px) rotate(-45deg); opacity: 0; }
-    }
-    .shooting-star {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 150px;
-      height: 2px;
-      background: linear-gradient(90deg, white, transparent);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 5;
     }
   </style>
 <script type="importmap">

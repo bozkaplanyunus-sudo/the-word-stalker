@@ -1,7 +1,7 @@
 
 export type Language = 'en' | 'fr' | 'tr';
 
-export type Category = 'Noun' | 'Verb' | 'Adjective' | 'Adverb' | 'Grammar';
+export type Category = 'noun' | 'verb' | 'adjective' | 'adverb' | 'Grammar';
 
 export type GameMode = 'vocabulary' | 'grammar';
 
@@ -28,8 +28,9 @@ export interface Word {
   en: string;
   fr: string;
   tr: string;
-  category: Category;
-  rarity: number;
+  type: 'noun' | 'verb';
+  planetId: number;
+  rarity?: number; // Mevcut map sistemiyle uyumluluk için opsiyonel
 }
 
 export interface GameState {

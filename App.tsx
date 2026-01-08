@@ -1,15 +1,29 @@
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { GameState, Language, Word, GameMode, GrammarExercise } from './types';
-import { WORD_DATABASE, GRAMMAR_DATABASE, LANGUAGES, UI_TRANSLATIONS, CATEGORIES, LEVEL_INFO, VOCAB_LEVEL_INFO } from './constants';
-import { speakWord } from './geminiService';
+import { WORD_DATABASE, GRAMMAR_DATABASE, LANGUAGES, UI_TRANSLATIONS, LEVEL_INFO } from './constants';
+import { speakWithBrowser } from './geminiService';
 import Planet from './components/Planet';
 
+// Fisher-Yates Shuffle Algoritması
+function shuffleArray<T>(array: T[]): T[] {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+}
+
 const App: React.FC = () => {
-  const [state, setState] = useState<GameState>({
+  // Uygulama başında havuzları bir kez karıştırıyoruz
+  const initialShuffledWords = useMemo(() => shuffleArray(WORD_DATABASE), []);
+  const initialShuffledGrammar = useMemo(() => shuffleArray(GRAMMAR_DATABASE), []);
+
+  const [state, setState] = useState<GameState & { poolIndex: number; currentLevelItems: (Word | GrammarExercise)[] }>({
     score: 0,
     currentMapLevel: 1,
-    maxUnlockedLevel: 20,
+    maxUnlockedLevel: 1, // Varsayılan olarak 1. gezegen açık
     currentLanguage: 'tr',
     targetLanguage: 'en',
     gameMode: 'vocabulary',
@@ -26,120 +40,135 @@ const App: React.FC = () => {
     totalAnswersInLevel: 0,
     seenItemIds: [],
     gameStatus: 'setup',
-    orderingState: []
+    orderingState: [],
+    poolIndex: 0,
+    currentLevelItems: []
   });
 
+  const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // LocalStorage'dan ilerlemeyi yükle
+  useEffect(() => {
+    const savedLevel = localStorage.getItem('stalker_maxLevel');
+    const savedScore = localStorage.getItem('stalker_score');
+    if (savedLevel || savedScore) {
+      setState(prev => ({
+        ...prev,
+        maxUnlockedLevel: savedLevel ? parseInt(savedLevel) : 1,
+        score: savedScore ? parseInt(savedScore) : 0
+      }));
+    }
+  }, []);
+
+  // İlerlemeyi LocalStorage'a kaydet
+  useEffect(() => {
+    localStorage.setItem('stalker_maxLevel', state.maxUnlockedLevel.toString());
+    localStorage.setItem('stalker_score', state.score.toString());
+  }, [state.maxUnlockedLevel, state.score]);
+
+  const mapPathPoints = useMemo(() => {
+    const points = [];
+    for (let i = 0; i < 20; i++) {
+      const x = 200 + i * 160;
+      const y = 350 + Math.sin(i * 0.8) * 120;
+      points.push({ x, y });
+    }
+    return points;
+  }, []);
 
   const t = (key: string) => {
     const translations = UI_TRANSLATIONS[state.currentLanguage] || UI_TRANSLATIONS.en;
     return translations[key] || key;
   };
 
-  const mapPathPoints = useMemo(() => {
-    const points = [];
-    for (let i = 0; i < 20; i++) {
-      points.push({
-        x: 100 + i * 160, 
-        y: 320 + Math.sin(i * 1.5) * 50 
-      });
-    }
-    return points;
-  }, []);
+  const getLangCode = (lang: Language) => {
+    const map = { en: 'en-US', fr: 'fr-FR', tr: 'tr-TR' };
+    return map[lang] || 'en-US';
+  };
 
-  const spaceBackground = useMemo(() => {
-    const stars = Array.from({ length: 150 }).map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-      size: Math.random() * 2 + 1,
-      duration: `${2 + Math.random() * 4}s`,
-      delay: `${Math.random() * 5}s`
-    }));
-    const nebulas = [
-      { color: 'rgba(99, 102, 241, 0.15)', left: '10%', top: '20%', size: '40vw' },
-      { color: 'rgba(168, 85, 247, 0.15)', left: '50%', top: '40%', size: '35vw' },
-      { color: 'rgba(236, 72, 153, 0.1)', left: '80%', top: '10%', size: '30vw' },
-      { color: 'rgba(14, 165, 233, 0.1)', left: '30%', top: '70%', size: '45vw' },
-    ];
-    return { stars, nebulas };
-  }, []);
+  const currentQuestionId = useMemo(() => {
+    return state.currentWord?.id || state.currentExercise?.id || 'none';
+  }, [state.currentWord, state.currentExercise]);
 
   useEffect(() => {
-    if (state.gameStatus === 'map' && scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const currentPlanetX = mapPathPoints[state.currentMapLevel - 1]?.x || 150;
-      const scrollPos = currentPlanetX - container.clientWidth / 2;
-      container.scrollTo({ left: scrollPos, behavior: 'smooth' });
-    }
-  }, [state.gameStatus, state.currentMapLevel, mapPathPoints]);
+    setState(prev => ({
+      ...prev,
+      selectedOption: null,
+      isCorrect: null,
+      orderingState: []
+    }));
+    setActiveAudioId(null);
+  }, [currentQuestionId]);
+
+  const handlePlayQuestionAudio = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (activeAudioId || !state.currentWord) return;
+    
+    const id = 'question-main';
+    setActiveAudioId(id);
+    const text = state.currentWord[state.currentLanguage];
+    const langCode = getLangCode(state.currentLanguage);
+    
+    speakWithBrowser(text, langCode, () => setActiveAudioId(null));
+  }, [activeAudioId, state.currentWord, state.currentLanguage]);
+
+  const handlePlayOptionAudio = useCallback((e: React.MouseEvent, optionText: string) => {
+    e.stopPropagation();
+    if (activeAudioId) return;
+
+    setActiveAudioId(optionText);
+    const targetLangCode = getLangCode(state.targetLanguage);
+    speakWithBrowser(optionText, targetLangCode, () => setActiveAudioId(null));
+  }, [activeAudioId, state.targetLanguage]);
 
   const nextQuestion = useCallback(() => {
+    setActiveAudioId(null);
+
     setState(prev => {
-      const isVocab = prev.gameMode === 'vocabulary';
+      const { poolIndex, currentLevelItems, gameMode, targetLanguage } = prev;
       
+      if (currentLevelItems.length === 0) return { ...prev, gameStatus: 'map' };
+
+      if (poolIndex >= currentLevelItems.length) {
+         return prev; 
+      }
+
+      const nextItem = currentLevelItems[poolIndex];
       const baseUpdate = {
         ...prev,
+        poolIndex: poolIndex + 1,
         selectedOption: null,
         isCorrect: null,
         orderingState: []
       };
 
-      if (isVocab) {
-        const levelWords = WORD_DATABASE.filter(w => w.rarity === prev.currentMapLevel);
-        const availableWords = levelWords.filter(w => !prev.seenItemIds.includes(w.id));
-        const wordPool = availableWords.length > 0 ? availableWords : (levelWords.length > 0 ? levelWords : WORD_DATABASE);
-        
-        if (wordPool.length === 0) return { ...baseUpdate, gameStatus: 'setup' };
-
-        const randomWord = wordPool[Math.floor(Math.random() * wordPool.length)];
+      if (gameMode === 'vocabulary') {
+        const word = nextItem as Word;
         const distractors = WORD_DATABASE
-            .filter(w => w.id !== randomWord.id)
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 2);
-            
-        const options = [randomWord[prev.targetLanguage], ...distractors.map(d => d[prev.targetLanguage])].sort(() => 0.5 - Math.random());
-
-        return {
-          ...baseUpdate,
-          currentWord: randomWord,
-          currentExercise: null,
-          options,
-          seenItemIds: [...prev.seenItemIds, randomWord.id]
-        };
+          .filter(w => w.id !== word.id && w.planetId === word.planetId)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 2);
+        
+        const options = [word[targetLanguage], ...distractors.map(d => d[targetLanguage])].sort(() => 0.5 - Math.random());
+        return { ...baseUpdate, currentWord: word, currentExercise: null, options };
       } else {
-        const levelEx = GRAMMAR_DATABASE.filter(g => g.level === prev.currentMapLevel && g.language === prev.targetLanguage);
-        const availableEx = levelEx.filter(g => !prev.seenItemIds.includes(g.id));
-        
-        if (levelEx.length === 0) {
-          return { ...baseUpdate, gameStatus: 'map' };
-        }
-
-        const exPool = availableEx.length > 0 ? availableEx : levelEx;
-        const randomEx = exPool[Math.floor(Math.random() * exPool.length)];
-        
-        return {
-          ...baseUpdate,
-          currentWord: null,
-          currentExercise: randomEx,
-          options: [...(randomEx.options || [])].sort(() => 0.5 - Math.random()),
-          seenItemIds: [...prev.seenItemIds, randomEx.id]
-        };
+        const ex = nextItem as GrammarExercise;
+        return { ...baseUpdate, currentWord: null, currentExercise: ex, options: [...ex.options].sort(() => 0.5 - Math.random()) };
       }
     });
   }, []);
 
   const selectLevel = (level: number) => {
+    if (level > state.maxUnlockedLevel) return;
+
     const isVocab = state.gameMode === 'vocabulary';
-    const hasGrammar = GRAMMAR_DATABASE.some(g => g.level === level && g.language === state.targetLanguage);
-    const hasVocab = WORD_DATABASE.some(w => w.rarity === level);
-    
-    if (isVocab && !hasVocab) {
-      alert("Bu seviye için henüz kelime içeriği yok.");
-      return;
-    }
-    if (!isVocab && !hasGrammar) {
-      alert("Bu seviye için henüz gramer içeriği yok.");
+    const levelItems = isVocab 
+      ? initialShuffledWords.filter(w => w.planetId === level)
+      : initialShuffledGrammar.filter(g => g.level === level && g.language === state.targetLanguage);
+
+    if (levelItems.length === 0) {
+      alert(isVocab ? "Bu gezegen için kelime içeriği yok." : "Bu gezegen için gramer içeriği yok.");
       return;
     }
 
@@ -152,30 +181,22 @@ const App: React.FC = () => {
       seenItemIds: [],
       selectedOption: null,
       isCorrect: null,
-      orderingState: []
+      orderingState: [],
+      currentLevelItems: levelItems,
+      poolIndex: 0
     }));
 
-    if (state.gameMode === 'vocabulary') {
-      setTimeout(() => nextQuestion(), 50);
-    }
-  };
-
-  const startActualPlay = () => {
-    setState(prev => ({ ...prev, gameStatus: 'playing' }));
-    setTimeout(() => nextQuestion(), 50);
+    if (state.gameMode === 'vocabulary') setTimeout(() => nextQuestion(), 50);
   };
 
   const handleAnswer = (answer: string) => {
     if (state.selectedOption !== null) return;
-
     const isVocab = state.gameMode === 'vocabulary';
     const exercise = state.currentExercise;
     
-    // Sıralama veya Diyalog Tamamlama Modu
     if (!isVocab && (exercise?.type === 'ordering' || exercise?.type === 'dialogue_completion')) {
       const currentOrder = [...(state.orderingState || []), answer];
       const requiredLength = exercise.type === 'dialogue_completion' ? 5 : exercise.options.length;
-      
       setState(prev => ({ ...prev, orderingState: currentOrder }));
 
       if (currentOrder.length === requiredLength) {
@@ -189,23 +210,31 @@ const App: React.FC = () => {
       return;
     }
 
-    const correctAnswer = isVocab 
-      ? state.currentWord?.[state.targetLanguage]
-      : state.currentExercise?.correctAnswer;
-
-    const correct = answer === correctAnswer;
-    finishAnswer(correct, answer);
+    const correctAnswer = isVocab ? state.currentWord?.[state.targetLanguage] : state.currentExercise?.correctAnswer;
+    finishAnswer(answer === correctAnswer, answer);
   };
 
   const finishAnswer = (correct: boolean, answer: string) => {
     const nextTotalCount = state.totalAnswersInLevel + 1;
-    const isLevelOver = nextTotalCount >= 10;
+    const isLevelOver = nextTotalCount >= state.currentLevelItems.length;
 
     setState(prev => {
       const newCorrectCount = correct ? prev.correctAnswersInLevel + 1 : prev.correctAnswersInLevel;
       let nextStatus = prev.gameStatus;
+      let nextMaxLevel = prev.maxUnlockedLevel;
+
       if (isLevelOver) {
-        nextStatus = newCorrectCount >= 8 ? 'level-up' : 'level-failed';
+        // 50 soruda en az 40 doğru (%80 başarı)
+        const successRate = newCorrectCount / prev.currentLevelItems.length;
+        if (successRate >= 0.8) {
+          nextStatus = 'level-up';
+          // Eğer bitirilen seviye şu anki maxLevel ise bir sonrakini aç
+          if (prev.currentMapLevel === prev.maxUnlockedLevel) {
+            nextMaxLevel = prev.currentMapLevel + 1;
+          }
+        } else {
+          nextStatus = 'level-failed';
+        }
       }
 
       return {
@@ -216,15 +245,12 @@ const App: React.FC = () => {
         streak: correct ? prev.streak + 1 : 0,
         correctAnswersInLevel: newCorrectCount,
         totalAnswersInLevel: nextTotalCount,
-        gameStatus: nextStatus
+        gameStatus: nextStatus,
+        maxUnlockedLevel: nextMaxLevel
       };
     });
 
-    if (!isLevelOver) {
-      setTimeout(() => {
-        nextQuestion();
-      }, 1500);
-    }
+    if (!isLevelOver) setTimeout(() => nextQuestion(), 1500);
   };
 
   const getOptionClasses = (option: string) => {
@@ -234,79 +260,31 @@ const App: React.FC = () => {
     if (!isVocab && (exercise?.type === 'ordering' || exercise?.type === 'dialogue_completion')) {
       const isSelected = state.orderingState?.includes(option);
       const isLargeSet = state.options.length > 5;
-      
-      const baseSize = isLargeSet ? "px-3 py-3 text-sm sm:text-base" : "px-4 py-5 text-lg sm:text-xl";
-      const base = `${baseSize} rounded-2xl font-black transition-all border-2 flex items-center justify-center transform active:scale-90 break-words text-center leading-tight shadow-lg `;
+      const baseSize = isLargeSet ? "px-3 py-3 text-sm" : "px-4 py-5 text-lg";
+      const base = `${baseSize} rounded-2xl font-black transition-all border-2 flex items-center justify-center transform shadow-lg bg-slate-800 border-slate-700 text-white `;
       
       if (state.selectedOption !== null) {
-        const correctOrder = exercise.correctAnswer;
-        const isNowCorrect = state.selectedOption === correctOrder;
-        return base + (isNowCorrect ? "bg-emerald-600 border-emerald-400" : "bg-rose-600 border-rose-400 opacity-50");
+        return base + (state.selectedOption === option ? "opacity-100" : "opacity-40 grayscale");
       }
-
-      return isSelected 
-        ? base + "bg-indigo-600 border-indigo-400 opacity-20 scale-90" 
-        : base + "bg-slate-800 border-slate-700 hover:border-indigo-500 text-white";
+      return isSelected ? base + "opacity-20 scale-90" : base + "active:scale-90";
     }
 
-    const correctAnswer = isVocab 
-      ? state.currentWord?.[state.targetLanguage]
-      : state.currentExercise?.correctAnswer;
-
-    const base = "w-full p-5 rounded-2xl text-xl font-bold transition-all border-2 flex items-center justify-center transform active:scale-95 ";
+    const base = "w-full p-5 rounded-2xl text-xl font-bold transition-all border-2 flex items-center justify-center transform bg-slate-800 border-slate-700 text-white shadow-sm ";
     
-    if (state.selectedOption === null) {
-      return base + "bg-slate-800 border-slate-700 hover:border-indigo-500 hover:bg-slate-700 text-white shadow-sm";
+    if (state.selectedOption !== null) {
+      if (state.selectedOption !== option) {
+        return base + "opacity-40 grayscale";
+      }
+    } else {
+      return base + "hover:border-indigo-500 active:scale-95";
     }
-
-    if (state.selectedOption === option) {
-      return option === correctAnswer
-        ? base + "bg-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-500/20 scale-[1.02]"
-        : base + "bg-rose-600 border-rose-400 text-white shadow-lg shadow-rose-500/20";
-    }
-
-    if (option === correctAnswer) {
-      return base + "bg-emerald-600/40 border-emerald-500/50 text-emerald-100";
-    }
-
-    return base + "bg-slate-900 border-slate-800 opacity-40 grayscale text-slate-500";
+    
+    return base;
   };
 
-  const renderDialogue = (sentence: string, answers: string[]) => {
-    const lines = sentence.split('\n');
-    return (
-      <div className="space-y-4 w-full max-w-lg mx-auto">
-        {lines.map((line, idx) => {
-          const isA = line.startsWith('A:') || line.startsWith('Ali:') || line.startsWith('Öğrenci:') || line.startsWith('Anne:') || line.startsWith('Garson:') || line.startsWith('Ece:') || line.startsWith('Yolcu:');
-          let content = line.includes(':') ? line.split(':')[1].trim() : line;
-          const speaker = line.includes(':') ? line.split(':')[0].trim() : '';
-
-          // Boşlukları doldur
-          const parts = content.split(/(\[\d+\])/);
-          
-          return (
-            <div key={idx} className={`flex flex-col ${isA ? 'items-start' : 'items-end'} animate-slide-in`}>
-              {speaker && <span className="text-[10px] font-bold text-slate-500 uppercase mb-1 ml-2 mr-2">{speaker}</span>}
-              <div className={`px-4 py-3 rounded-2xl text-lg font-medium shadow-md transition-all duration-500 ${isA ? 'bg-indigo-600/20 border-l-4 border-indigo-500 rounded-tl-none' : 'bg-slate-800 border-r-4 border-slate-600 rounded-tr-none text-right'}`}>
-                {parts.map((part, pIdx) => {
-                  const match = part.match(/\[(\d+)\]/);
-                  if (match) {
-                    const blankIdx = parseInt(match[1]) - 1;
-                    const filledWord = answers[blankIdx];
-                    return (
-                      <span key={pIdx} className={`inline-block min-w-[60px] mx-1 border-b-2 transition-all ${filledWord ? 'text-indigo-400 border-indigo-400 animate-bounce' : 'text-slate-600 border-slate-600 border-dashed'}`}>
-                        {filledWord || `(${blankIdx + 1})`}
-                      </span>
-                    );
-                  }
-                  return <span key={pIdx}>{part}</span>;
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
+  const startActualPlay = () => {
+    setState(prev => ({ ...prev, gameStatus: 'playing' }));
+    setTimeout(() => nextQuestion(), 50);
   };
 
   if (state.gameStatus === 'setup') {
@@ -314,7 +292,7 @@ const App: React.FC = () => {
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-white bg-slate-900">
         <div className="max-w-md w-full space-y-8 bg-slate-800 p-8 rounded-3xl shadow-2xl border border-slate-700">
           <div className="text-center">
-            <h1 className="text-4xl font-extrabold text-indigo-400 mb-2 font-['Nunito']">{t('welcome')}</h1>
+            <h1 className="text-4xl font-extrabold text-indigo-400 mb-2">{t('welcome')}</h1>
             <p className="text-slate-400">{t('subWelcome')}</p>
           </div>
           <div className="space-y-4">
@@ -322,13 +300,9 @@ const App: React.FC = () => {
               <label className="block text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">{t('sourceLabel')}</label>
               <div className="grid grid-cols-3 gap-2">
                 {LANGUAGES.map(lang => (
-                  <button
-                    key={lang.code}
-                    onClick={() => setState(p => ({ ...p, currentLanguage: lang.code as Language }))}
-                    className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${state.currentLanguage === lang.code ? 'border-indigo-500 bg-indigo-500/20' : 'border-slate-700 hover:bg-slate-700'}`}
-                  >
+                  <button key={lang.code} onClick={() => setState(p => ({ ...p, currentLanguage: lang.code as Language }))} className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${state.currentLanguage === lang.code ? 'border-indigo-500 bg-indigo-500/20' : 'border-slate-700 hover:bg-slate-700'}`}>
                     <span className="text-2xl">{lang.flag}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest">{lang.name}</span>
+                    <span className="text-[10px] font-bold uppercase">{lang.name}</span>
                   </button>
                 ))}
               </div>
@@ -337,13 +311,9 @@ const App: React.FC = () => {
               <label className="block text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">{t('targetLabel')}</label>
               <div className="grid grid-cols-3 gap-2">
                 {LANGUAGES.map(lang => (
-                  <button
-                    key={lang.code}
-                    onClick={() => setState(p => ({ ...p, targetLanguage: lang.code as Language }))}
-                    className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${state.targetLanguage === lang.code ? 'border-purple-500 bg-purple-500/20' : 'border-slate-700 hover:bg-slate-700'}`}
-                  >
+                  <button key={lang.code} onClick={() => setState(p => ({ ...p, targetLanguage: lang.code as Language }))} className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${state.targetLanguage === lang.code ? 'border-purple-500 bg-purple-500/20' : 'border-slate-700 hover:bg-slate-700'}`}>
                     <span className="text-2xl">{lang.flag}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest">{lang.name}</span>
+                    <span className="text-[10px] font-bold uppercase">{lang.name}</span>
                   </button>
                 ))}
               </div>
@@ -351,27 +321,12 @@ const App: React.FC = () => {
             <div>
               <label className="block text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">{t('modeLabel')}</label>
               <div className="flex gap-2">
-                <button
-                  onClick={() => setState(p => ({ ...p, gameMode: 'vocabulary' }))}
-                  className={`flex-1 p-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${state.gameMode === 'vocabulary' ? 'border-emerald-500 bg-emerald-500/20' : 'border-slate-700 hover:bg-slate-700'}`}
-                >
-                  🚀 {t('vocabularyMode')}
-                </button>
-                <button
-                  onClick={() => setState(p => ({ ...p, gameMode: 'grammar' }))}
-                  className={`flex-1 p-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${state.gameMode === 'grammar' ? 'border-blue-500 bg-blue-500/20' : 'border-slate-700 hover:bg-slate-700'}`}
-                >
-                  🧩 {t('grammarMode')}
-                </button>
+                <button onClick={() => setState(p => ({ ...p, gameMode: 'vocabulary' }))} className={`flex-1 p-3 rounded-xl border-2 transition-all ${state.gameMode === 'vocabulary' ? 'border-emerald-500 bg-emerald-500/20' : 'border-slate-700'}`}>🚀 {t('vocabularyMode')}</button>
+                <button onClick={() => setState(p => ({ ...p, gameMode: 'grammar' }))} className={`flex-1 p-3 rounded-xl border-2 transition-all ${state.gameMode === 'grammar' ? 'border-blue-500 bg-blue-500/20' : 'border-slate-700'}`}>🧩 {t('grammarMode')}</button>
               </div>
             </div>
           </div>
-          <button
-            onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))}
-            className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg shadow-lg shadow-indigo-500/30 transition-all active:scale-95"
-          >
-            {t('startBtn')}
-          </button>
+          <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg shadow-lg active:scale-95">{t('startBtn')}</button>
         </div>
       </div>
     );
@@ -380,100 +335,24 @@ const App: React.FC = () => {
   if (state.gameStatus === 'map') {
     return (
       <div className="h-screen bg-[#020617] relative overflow-hidden">
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          {spaceBackground.nebulas.map((n, i) => (
-            <div 
-              key={i}
-              className="absolute rounded-full blur-[80px] opacity-40"
-              style={{
-                backgroundColor: n.color,
-                left: n.left,
-                top: n.top,
-                width: n.size,
-                height: n.size,
-              }}
-            />
-          ))}
-          {spaceBackground.stars.map(star => (
-            <div 
-              key={star.id}
-              className="star star-twinkle"
-              style={{
-                left: star.left,
-                top: star.top,
-                width: `${star.size}px`,
-                height: `${star.size}px`,
-                // @ts-ignore
-                '--duration': star.duration,
-                animationDelay: star.delay
-              }}
-            />
-          ))}
-        </div>
-
         <div className="absolute top-6 left-6 z-20 flex gap-4">
-           <button 
-            onClick={() => setState(p => ({ ...p, gameStatus: 'setup' }))}
-            className="px-4 py-2 bg-slate-800/80 backdrop-blur-md border border-slate-700 rounded-xl text-slate-400 hover:text-white transition-colors flex items-center gap-2"
-          >
-            ← {t('backToHome')}
-          </button>
-          <div className="px-4 py-2 bg-indigo-600/30 backdrop-blur-md border border-indigo-500/40 rounded-xl text-indigo-300 font-bold flex items-center gap-2">
-            🏆 {state.score}
-          </div>
+           <button onClick={() => setState(p => ({ ...p, gameStatus: 'setup' }))} className="px-4 py-2 bg-slate-800/80 backdrop-blur-md border border-slate-700 rounded-xl text-slate-400 hover:text-white transition-colors flex items-center gap-2">← {t('backToHome')}</button>
+           <div className="px-4 py-2 bg-indigo-600/30 border border-indigo-500/40 rounded-xl text-indigo-300 font-bold">🏆 {state.score}</div>
         </div>
-
-        <div 
-          ref={scrollContainerRef}
-          className="h-full overflow-x-auto overflow-y-hidden no-scrollbar cursor-grab active:cursor-grabbing relative z-10"
-        >
+        <div ref={scrollContainerRef} className="h-full overflow-x-auto overflow-y-hidden no-scrollbar cursor-grab active:cursor-grabbing relative z-10">
           <div className="h-full relative" style={{ width: 20 * 160 + 400 }}>
-            <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
-              <path 
-                d={`M ${mapPathPoints.map(p => `${p.x},${p.y}`).join(' L ')}`}
-                fill="none" 
-                stroke="white" 
-                strokeWidth="1.5" 
-                strokeDasharray="4 6" 
-                opacity="0.15" 
-              />
-            </svg>
-
             {mapPathPoints.map((p, i) => {
-              const level = i + 1;
-              const isUnlocked = level <= state.maxUnlockedLevel;
-              const colors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6', '#10b981', '#22c55e', '#84cc16', '#eab308', '#f59e0b', '#f97316'];
-              
-              let levelTitle = t('level') + " " + level;
-              if (state.gameMode === 'vocabulary') {
-                const vocabInfo = VOCAB_LEVEL_INFO[state.currentLanguage]?.[level];
-                if (vocabInfo) levelTitle = vocabInfo.title[state.currentLanguage];
-              } else {
-                const grammarInfo = LEVEL_INFO[state.targetLanguage]?.[level];
-                if (grammarInfo) levelTitle = grammarInfo.title[state.currentLanguage];
-              }
-
+              const planetLevel = i + 1;
+              const isUnlocked = planetLevel <= state.maxUnlockedLevel;
               return (
-                <div 
-                  key={level}
-                  className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-                  style={{ left: p.x, top: p.y }}
-                  onClick={() => isUnlocked && selectLevel(level)}
-                >
-                  <div className="relative group">
-                    <svg width="140" height="140" viewBox="-80 -80 160 160">
-                      <Planet 
-                        level={level} 
-                        color={colors[i % colors.length]} 
-                        size={30 + (i % 3) * 8} 
-                        isUnlocked={isUnlocked} 
-                      />
-                    </svg>
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-center w-[160px]">
-                      <span className={`text-[11px] font-black uppercase tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${isUnlocked ? 'text-white' : 'text-slate-600'}`}>
-                        {levelTitle}
-                      </span>
-                    </div>
+                <div key={planetLevel} className={`absolute transform -translate-x-1/2 -translate-y-1/2 ${isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'}`} style={{ left: p.x, top: p.y }} onClick={() => selectLevel(planetLevel)}>
+                  <svg width="140" height="140" viewBox="-80 -80 160 160">
+                     <Planet level={planetLevel} color={['#f43f5e', '#ec4899', '#a855f7', '#6366f1', '#3b82f6'][i%5]} size={30+(i%3)*8} isUnlocked={isUnlocked} />
+                  </svg>
+                  <div className="text-center mt-1">
+                    <span className="text-[11px] font-black uppercase text-white">
+                      {isUnlocked ? (LEVEL_INFO[state.currentLanguage]?.[planetLevel]?.title[state.currentLanguage] || t('level') + " " + planetLevel) : 'Locked'}
+                    </span>
                   </div>
                 </div>
               );
@@ -485,83 +364,19 @@ const App: React.FC = () => {
   }
 
   if (state.gameStatus === 'explanation') {
-    const topic = LEVEL_INFO[state.targetLanguage]?.[state.currentMapLevel];
-    const nativeTitle = topic?.title[state.currentLanguage] || topic?.title['en'] || t('level') + " " + state.currentMapLevel;
-    const nativeExplanation = topic?.explanation[state.currentLanguage] || topic?.explanation['en'];
-    
-    // Diyalog içeren örnekleri ayır
-    const dialogueEx = topic?.examples.find(ex => ex.label['en'].toLowerCase().includes('dialog'));
-    const otherExamples = topic?.examples.filter(ex => !ex.label['en'].toLowerCase().includes('dialog')) || [];
-    const isDense = otherExamples.length > 6;
-
+    const topic = LEVEL_INFO[state.currentLanguage]?.[state.currentMapLevel];
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center p-4 sm:p-10 text-white overflow-y-auto no-scrollbar">
-        <div className="max-w-3xl w-full bg-slate-900 border border-slate-800 p-6 sm:p-10 rounded-[2.5rem] shadow-2xl question-entrance my-4 sm:my-8 flex flex-col gap-8">
-          
-          {/* Header */}
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center p-6 text-white">
+        <div className="max-w-3xl w-full bg-slate-900 border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl question-entrance my-8 space-y-8">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-indigo-600/30 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-indigo-500/20">📖</div>
-            <div>
-              <p className="text-indigo-400 font-bold uppercase tracking-widest text-[11px] mb-1">{t('lessonTitle')}</p>
-              <h1 className="text-3xl font-black leading-tight no-uppercase">{nativeTitle}</h1>
-            </div>
+            <div className="w-14 h-14 bg-indigo-600/30 rounded-2xl flex items-center justify-center text-3xl">📖</div>
+            <h1 className="text-3xl font-black no-uppercase">{topic?.title[state.currentLanguage] || t('level') + " " + state.currentMapLevel}</h1>
           </div>
-
-          {/* Explanation Text */}
-          {nativeExplanation && (
-            <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 shadow-sm">
-              <p className="text-slate-300 leading-relaxed text-base no-uppercase">{nativeExplanation}</p>
-            </div>
-          )}
-          
-          {/* Details / Examples Grid */}
-          {otherExamples.length > 0 && (
-            <div className="flex flex-col gap-4">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">İfadeler ve Detaylar</h3>
-              <div className={`grid gap-3 ${isDense ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1'}`}>
-                {otherExamples.map((ex, i) => (
-                  <div key={i} className="flex flex-col items-start justify-center p-4 bg-slate-800/20 rounded-2xl border border-slate-700/30 transition-all hover:bg-slate-800/40 hover:border-slate-600 shadow-sm">
-                    <div className="flex flex-col w-full">
-                      <span className="font-black text-white text-lg sm:text-xl no-uppercase leading-tight mb-1">
-                        {ex.label[state.targetLanguage]}
-                      </span>
-                      {state.targetLanguage !== state.currentLanguage && (
-                        <span className="text-indigo-400 text-[11px] font-bold no-uppercase opacity-80 mb-2">
-                          {ex.label[state.currentLanguage]}
-                        </span>
-                      )}
-                    </div>
-                    <div className="w-full h-px bg-slate-700/50 my-2" />
-                    <span className="text-slate-400 text-xs font-medium no-uppercase leading-normal">
-                      {ex.content[state.currentLanguage] || ex.content['en']}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Special Dialogue Box */}
-          {dialogueEx && (
-            <div className="flex flex-col gap-4 pt-4 border-t border-slate-800">
-              <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest pl-1">{dialogueEx.label[state.currentLanguage]}</h3>
-              <div className="bg-indigo-950/20 border-2 border-indigo-500/20 p-6 sm:p-8 rounded-[2rem] shadow-inner">
-                <pre className="whitespace-pre-wrap font-['Nunito'] text-base sm:text-lg leading-loose text-indigo-100 no-uppercase tracking-tight">
-                  {dialogueEx.content[state.currentLanguage] || dialogueEx.content['en']}
-                </pre>
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex flex-col gap-4 mt-4">
-            <button onClick={startActualPlay} className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-black text-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95 transform">
-              🚀 {t('startLesson')}
-            </button>
-            <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="w-full py-2 text-slate-500 font-bold text-xs hover:text-white transition-colors uppercase tracking-widest">
-              {t('backToMap')}
-            </button>
+          <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50">
+            <p className="text-slate-300 no-uppercase">{topic?.explanation[state.currentLanguage]}</p>
+            <p className="mt-4 text-xs font-bold text-indigo-400 uppercase tracking-widest">Gezegen Görevi: 50 soruda en az 40 doğru yapmalısın.</p>
           </div>
+          <button onClick={startActualPlay} className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-black text-xl shadow-xl active:scale-95">🚀 {t('startLesson')}</button>
         </div>
       </div>
     );
@@ -569,98 +384,79 @@ const App: React.FC = () => {
 
   if (state.gameStatus === 'playing') {
     const isVocab = state.gameMode === 'vocabulary';
-    const exercise = state.currentExercise;
-    const progress = (state.totalAnswersInLevel / 10) * 100;
-    const uniqueQuestionKey = `q-key-${state.totalAnswersInLevel}-${state.currentWord?.id || state.currentExercise?.id || 'none'}`;
+    const totalCount = state.currentLevelItems.length || 50;
+    const correctProgress = (state.correctAnswersInLevel / totalCount) * 100;
+    const isThresholdMet = state.correctAnswersInLevel >= 40;
+    const progressColorClass = isThresholdMet ? 'bg-emerald-500' : 'bg-rose-500';
+    const textColorClass = isThresholdMet ? 'text-emerald-400' : 'text-rose-400';
 
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col text-white p-4 sm:p-6 relative overflow-hidden">
-        <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col pb-24">
-          <div className="flex justify-between items-center mb-8 sm:mb-12">
+      <div className="min-h-screen bg-slate-950 flex flex-col text-white p-4 sm:p-6 relative">
+        <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
+          <div className="flex justify-between items-center mb-12">
             <div className="flex-1 pr-8">
+              <div className="flex justify-between mb-1">
+                <span className={`text-[10px] font-bold uppercase transition-colors duration-300 ${textColorClass}`}>
+                   {state.correctAnswersInLevel} / {totalCount}
+                </span>
+              </div>
               <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-indigo-500 transition-all duration-500" style={{ width: `${progress}%` }} />
+                <div className={`h-full transition-all duration-500 ${progressColorClass}`} style={{ width: `${correctProgress}%` }} />
               </div>
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('score')}</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase">{t('score')}</p>
               <p className="text-xl font-black text-indigo-400">{state.score}</p>
             </div>
           </div>
           
-          <div key={uniqueQuestionKey} className="flex-1 flex flex-col items-center justify-center space-y-8 question-entrance">
+          <div key={currentQuestionId} className="flex-1 flex flex-col items-center justify-center space-y-8 question-entrance">
             <div className="w-full text-center">
               {isVocab && state.currentWord ? (
                 <div className="space-y-4">
-                  <span className="px-4 py-1.5 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded-full uppercase tracking-tighter border border-indigo-500/30">
-                    {state.currentWord.category}
-                  </span>
-                  <h2 className="text-5xl font-black no-uppercase text-white tracking-tight leading-tight">
-                    {state.currentWord[state.currentLanguage]}
-                  </h2>
-                </div>
-              ) : exercise && (
-                <div className="space-y-6 w-full">
-                  <span className="px-4 py-1.5 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full uppercase tracking-tighter border border-blue-500/30">
-                    {exercise.topic}
-                  </span>
-                  
-                  {exercise.type === 'dialogue_completion' ? (
-                    renderDialogue(exercise.sentence, state.orderingState || [])
-                  ) : (
-                    <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-slate-400 uppercase tracking-widest">{t('orderingInstruction')}</h2>
-                      <div className="flex flex-wrap justify-center gap-1.5 min-h-[60px] p-4 bg-slate-900/60 border-2 border-dashed border-slate-700 rounded-3xl overflow-y-auto max-h-[160px] no-scrollbar">
-                        {(state.orderingState || []).map((char, i) => (
-                          <div key={i} className={`px-3 py-2 bg-indigo-600 rounded-xl font-black leading-tight text-center text-lg`}>
-                            {char}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="mt-4 p-3 bg-slate-900/40 border border-slate-800 rounded-2xl">
-                    <p className="text-slate-400 italic text-sm no-uppercase max-w-md mx-auto">{exercise.translations[state.currentLanguage]}</p>
+                  <span className="px-4 py-1.5 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded-full uppercase">{state.currentWord.type}</span>
+                  <div className="flex items-center justify-center gap-4">
+                    <h2 className="text-5xl font-black no-uppercase text-white tracking-tight">{state.currentWord[state.currentLanguage]}</h2>
+                    <button onClick={handlePlayQuestionAudio} className={`p-1 rounded-xl shadow-lg ${activeAudioId === 'question-main' ? 'text-white bg-purple-800' : 'text-purple-400 bg-purple-900/30'}`} style={{ fontSize: '2.5rem' }}><span className="material-icons" style={{ fontSize: 'inherit' }}>volume_up</span></button>
                   </div>
+                </div>
+              ) : state.currentExercise && (
+                <div className="space-y-6 w-full">
+                  <span className="px-4 py-1.5 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full uppercase">{state.currentExercise.topic}</span>
+                  <div className="mt-4 p-3 bg-slate-900/40 border border-slate-800 rounded-2xl"><p className="text-slate-400 italic text-sm no-uppercase">{state.currentExercise.translations[state.currentLanguage]}</p></div>
                 </div>
               )}
             </div>
 
-            {(exercise?.type === 'ordering' || exercise?.type === 'dialogue_completion') ? (
-              <div className="w-full space-y-4">
-                <div className={`grid gap-2 w-full ${state.options.length > 5 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-                  {state.options.map((option, idx) => (
-                    <button
-                      key={`${uniqueQuestionKey}-opt-${idx}`}
-                      onClick={() => handleAnswer(option)}
-                      disabled={state.selectedOption !== null || state.orderingState?.includes(option)}
-                      className={getOptionClasses(option)}
-                    >
-                      <span className="no-uppercase">{option}</span>
+            <div className="grid grid-cols-1 gap-4 w-full">
+              {state.options.map((option, idx) => {
+                const isSelected = state.selectedOption === option;
+                const correctAnswer = isVocab ? state.currentWord?.[state.targetLanguage] : state.currentExercise?.correctAnswer;
+                const isCorrect = option === correctAnswer;
+                
+                let textStyleClasses = "";
+                if (state.selectedOption !== null && isSelected) {
+                  textStyleClasses = `animate-shake ${isCorrect ? 'text-correct' : 'text-incorrect'}`;
+                }
+
+                return (
+                  <div key={`${currentQuestionId}-opt-${idx}`} className="relative group">
+                    <button onClick={() => handleAnswer(option)} disabled={state.selectedOption !== null} className={getOptionClasses(option)}>
+                      <span className={`no-uppercase transition-colors duration-300 ${textStyleClasses}`}>
+                        {option}
+                      </span>
                     </button>
-                  ))}
-                </div>
-                <button onClick={() => setState(p => ({ ...p, orderingState: [] }))} disabled={state.selectedOption !== null} className="w-full py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-white transition-colors bg-slate-800/30 rounded-xl border border-slate-700/50">
-                  ↺ {t('clear')}
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4 w-full">
-                {state.options.map((option, idx) => (
-                  <button key={`${uniqueQuestionKey}-opt-${idx}`} onClick={() => handleAnswer(option)} disabled={state.selectedOption !== null} className={getOptionClasses(option)}>
-                    <span className="no-uppercase">{option}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+                    {isVocab && (
+                      <button onClick={(e) => handlePlayOptionAudio(e, option)} className={`absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg shadow-sm z-10 ${activeAudioId === option ? 'text-white bg-purple-800' : 'text-purple-400 bg-purple-900/40'}`}><span className="material-icons" style={{ fontSize: '1.25rem' }}>volume_up</span></button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-        
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30">
-          <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="px-6 py-3 bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-2xl text-slate-400 hover:text-white transition-all flex items-center gap-2 shadow-2xl active:scale-95">
-            🗺️ {t('backToMap')}
-          </button>
+          <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="px-6 py-3 bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-2xl text-slate-400 hover:text-white flex items-center gap-2 shadow-2xl">🗺️ {t('backToMap')}</button>
         </div>
       </div>
     );
@@ -672,36 +468,18 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-white">
         <div className={`max-w-md w-full p-8 rounded-[2.5rem] border-2 shadow-2xl text-center space-y-8 ${win ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-rose-950/20 border-rose-500/30'}`}>
           <div className="text-6xl">{win ? '🎊' : '💀'}</div>
-          <div>
-            <h1 className="text-4xl font-black mb-2">{win ? t('promoted') : t('failed')}</h1>
-            <p className="text-slate-400">{win ? t('levelClear') : t('failedSub')}</p>
-          </div>
-          <div className="flex justify-center gap-8 py-4 bg-slate-900/50 rounded-3xl border border-slate-800">
-            <div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Accurate</p>
-              <p className="text-2xl font-black text-white">{state.correctAnswersInLevel}/10</p>
-            </div>
-            <div className="w-px bg-slate-800" />
-            <div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">XP Gained</p>
-              <p className="text-2xl font-black text-indigo-400">+{state.correctAnswersInLevel * 10}</p>
-            </div>
+          <h1 className="text-4xl font-black">{win ? t('promoted') : t('failed')}</h1>
+          <div className="space-y-2">
+            <p className={`text-slate-400 font-bold ${win ? 'text-emerald-400' : 'text-rose-400'}`}>Doğru: {state.correctAnswersInLevel} / {state.currentLevelItems.length}</p>
+            <p className="text-sm text-slate-500">{win ? "Harika! Bir sonraki gezegenin kilidi açıldı." : "Yeterli puana ulaşamadın (en az 40 doğru gerekli). Tekrar dene."}</p>
           </div>
           <div className="flex flex-col gap-3">
             {win ? (
-              <button onClick={() => {
-                setState(p => ({ ...p, gameStatus: 'map', maxUnlockedLevel: Math.max(p.maxUnlockedLevel, p.currentMapLevel + 1), currentMapLevel: p.currentMapLevel + 1 }));
-              }} className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-500/20 transition-all active:scale-95">
-                {t('nextSector')}
-              </button>
+              <button onClick={() => selectLevel(state.currentMapLevel + 1)} className="w-full py-5 bg-indigo-600 rounded-2xl font-bold text-lg active:scale-95">{t('nextSector')}</button>
             ) : (
-              <button onClick={() => selectLevel(state.currentMapLevel)} className="w-full py-5 bg-rose-600 hover:bg-rose-500 rounded-2xl font-bold text-lg shadow-xl shadow-rose-500/20 transition-all active:scale-95">
-                {t('retry')}
-              </button>
+              <button onClick={() => selectLevel(state.currentMapLevel)} className="w-full py-5 bg-rose-600 rounded-2xl font-bold text-lg active:scale-95">{t('retry')}</button>
             )}
-            <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="w-full py-4 bg-slate-800 hover:bg-slate-700 rounded-2xl font-bold text-slate-400 transition-all">
-              {t('backToMap')}
-            </button>
+            <button onClick={() => setState(p => ({ ...p, gameStatus: 'map' }))} className="w-full py-4 bg-slate-800 rounded-2xl font-bold text-slate-400">{t('backToMap')}</button>
           </div>
         </div>
       </div>
